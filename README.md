@@ -8,7 +8,7 @@ These examples use a software for visualization and interaction of simple 3D ele
 
 There is not installation process, this application can be opened directly.
 
-This repository contains examples that uses this **HS-ims app** considering three programming languages; [Python](https://www.python.org/), [C++](https://cplusplus.com/), and [Max 8](https://cycling74.com/products/max). However, as you can communicate with the **HS-ims app** through [OSC](https://ccrma.stanford.edu/groups/osc/index.html) messages, you can use software that supports standard UDP communication and create you own interactive swarm system. With that in mind, we are going to describe first the **HS-ims app**, then *how to run the examples*, and the *OSC API* for the **HS-ims app** if you want to create your own applications.
+This repository contains examples that use this **HS-ims app** considering three programming languages; [Python](https://www.python.org/), [C++](https://cplusplus.com/), and [Max 8](https://cycling74.com/products/max). However, as you can communicate with the **HS-ims app** through [OSC](https://ccrma.stanford.edu/groups/osc/index.html) messages, you can use any software that supports standard UDP communication and create you own interactive swarm system. With that in mind, we are going to describe first the **HS-ims app**, then *how to run the examples*, and the *OSC API* for the **HS-ims app** if you want to create your own applications.
 
 
 
@@ -23,7 +23,7 @@ This app serves mainly for three purposes:
 
 [image 3D sphere and cube]
 
-These two objects were created by another software (let's call it *X app*) that sent the corresponding OSC messages to instantiate and place them in an specific (x, y, z) point. Both objects can be clicked (left or right button in the mouse) and only the cube can be moved in the plane of its faces using the mouse, these interactions can be sent back to *X app* if needed, which allows a two-way communication. As OSC messages are based on UDP, the **HS-ims app** and *X app* can reside in different machines connected through the network. We are exemplifying in this repository this two-way communication with the three programming languages used in the examples ([Python](https://www.python.org/), [C++](https://cplusplus.com/), and [Max 8](https://cycling74.com/products/max). At the end, we are going to describe the OSC API and some features that allows you to use the **HS-ims app** and understand the examples in this repository.
+These two objects were created by another software (let's call it *X app*) that sent the corresponding OSC messages to instantiate and place them in an specific (x, y, z) point. Both objects can be clicked (left or right button in the mouse) and only the cube can be moved in the plane of its faces using the mouse, these interactions can be sent back to *X app* if needed, which allows a two-way communication. As OSC messages are based on UDP, the **HS-ims app** and *X app* can reside in different machines connected through the network. We are exemplifying in this repository this two-way communication with the three programming languages used in the examples ([Python](https://www.python.org/), [C++](https://cplusplus.com/), and [Max 8](https://cycling74.com/products/max). At the end, we are going to describe the OSC API that allows you to use the **HS-ims app** and understand the examples in this repository.
 
 ## 2. How to run the examples
 
@@ -96,13 +96,27 @@ Specifies the audio synthesizer ID parameter to modify. Depending of the paramet
   `82`: *Amp_env_attack* <sub> Attack time for the amplitude envelop of a synthesizer in seconds.</sub>\
   `83`: *Amp_env_decay* <sub> Decay time for the amplitude envelop of a synthesizer in seconds.</sub>\
   `85`: *Amp_env_sustain* <sub> Sustain level for the amplitude envelop of a synthesizer.`value` between 0.0 and 1.0</sub>\
-  `17`: *Amp_env_release* <sub> Release time for the amplitude envelop of a synthesizer in seconds.
+  `17`: *Amp_env_release* <sub> Release time for the amplitude envelop of a synthesizer in seconds.</sub>\
+  `93`: *Low Pass Filter - Cut Off Frequency* <sub> `value` in Hz.</sub>\
+  `18`: *Low Pass Filter - Resonance(Q)* <sub> `value` between 0 and 1.0</sub>\
+  `19`: *Reverb - Room* <sub> `value` between -10000.0 and 0.0 (from less to more reverb effect)</sub>
 
+- **control_type**\
+ Specifies the code for a control type when an action is performed over an agent (see `/agents/control`):
 
-- **event**\
-  Specifies the type of boundary event (see ):
+  `0`: *Left mouse click*\
+  `1`: *Right mouse click*
 
-  `0`: *Enter boundary*
+- **control_value**\
+ Specifies the value for a control when an action is performed over an agent (see `/agents/control`):
+
+  `0`: *Release*\
+  `1`: *Press*
+
+- **event_type**\
+  Specifies the type of boundary event (see `/boundary/event/id`):
+
+  `0`: *Enter boundary*\
   `1`: *Exit boundary*
 
   ## 3.2. Incoming OSC Messages
@@ -144,14 +158,48 @@ Specifies the audio synthesizer ID parameter to modify. Depending of the paramet
 | Update or Create a 3D Arrow (only one exist in the world so far) | `/arrow` | `x y z dx dy dz scale`  | Update or create an arrow at a position (x, y, z) with a direction (dx, dy, dz) and a scale. All in mm.  | `/arrow 100 200 -400 0 0 -1 2000` (Create a 3D arrow at (100, 200, -400) point at in the same direction of the negative Z axis with a size of 2000 mm) |
 | Remove Arrow | `/arrow/remove` |   Remove the arrow if it exist in the world.   | `/arrow/remove`|
 
-| Description                         | Address                                    | Parameters                                                                       | Usage                                                        |
-|-------------------------------------|--------------------------------------------|----------------------------------------------------------------------------------|--------------------------------------------------------------|
-| Add Audio Synthesizer               | `/agents/audio/synth/add`                  | `N shape movMode`                                                                | Add audio synthesizers to agents with specified properties.  |
-| Add Audio Synthesizer By ID         | `/agents/audio/synth/add/id`               | `id...`                                                                          | Add audio synthesizers to specified agents by ID.           |
-| Remove Audio Synthesizers           | `/agents/audio/synth/remove`               | `N shape movMode`                                                                | Remove audio synthesizers from agents with specified properties. |
-| Remove Audio Synthesizers By ID     | `/agents/audio/synth/remove/id`            | `id...`                                                                          | Remove audio synthesizers from specified agents by ID.      |
-| Set Audio Synth Parameter Value     | `/agents/audio/synth/param_val`            | `agent_id bank cc_id actual_value`                                               | Set synthesizer parameter values for agent.                 |
-| Set Audio Synth MIDI Parameter      | `/agents/audio/synth/param_midi`           | `agent_id bank cc_id midi_value`                                                 | Set synthesizer MIDI control values for agent.              |
-| Send Audio Synth Note               | `/agents/audio/synth/note`                 | `agent_id bank note velocity`                                                    | Send note command to audio synthesizer for agent.           |
-| Flush Audio Synth                   | `/agents/audio/synth/flush`                | `agent_id bank`                                                                  | Flush audio synthesizer for agent.                          |
-| Set Audio Listener Position (DUP?)  | `/audio/listener/position`                 | `x y z`                                                                          | Set the position for the audio listener (duplicated entry?). |
+### Audio Module
+
+| Description | Address | Parameters | Usage | Examples |
+|---|---|---|---|---|
+| Add Audio Synthesizer | `/agents/audio/synth/add`| `N [shape=-1] [movMode=-1]` | Add and audio synthesizer to the N first agents created. `shape` or/and `movMode` can be used as filters if needed (-1 means all). | `/agents/audio/synth/add 5 1 1` (Add an audio synthesizer component to 5 cube agents in Follow movement mode. )|
+| Add Audio Synthesizer By ID | `/agents/audio/synth/add/id`| `id0 id1 id2...` | Add audio synthesizers to specified agents by ID. | `/agents/audio/synth/add/id 3 5 19` (Add audio synthesizers to agents 3, 5 and 19) |
+| Remove Audio Synthesizers | `/agents/audio/synth/remove`| `N [shape=-1] [movMode=-1]` | Remove audio synthesizers from the N first agents created. `shape` or/and `movMode` can be used as filters if needed (-1 means all). | `/agents/audio/synth/remove 3 5 19` (Remove audio synthesizers from agents 3, 5 and 19) |
+| Remove Audio Synthesizers By ID | `/agents/audio/synth/remove/id`| `id0 id1 id2...` | Remove audio synthesizers from specified agents by ID. | `/agents/audio/synth/remove/id 3 5 19` (Remove audio synthesizers to agents 3, 5 and 19) |
+| Set Audio Synth Parameter Value | `/agents/audio/synth/param_val` | `agent_id bank cc_id value` | Set the `value` for a synthesizer parameter identified with `cc_id`  for agent with ID =`agent_id` within a `bank` (always zero for now). See `cc_id` in the enum definitions to target specific parameters | `/agents/audio/synth/param_val 3 0 93 500` (Set the cut off frequency of a low pass filter for agent 3 to 500 Hz)
+| Set Audio Synth MIDI Parameter | `/agents/audio/synth/param_midi` | `agent_id bank cc_id midi_value`  | As the previous message, but instead of providing the actual value for a parameter, we give an integer number between 0 and 127, being a standard MIDI range. Depending of the parameter, this range will map to its minimum and maximum value.| `/agents/audio/synth/param_midi 3 0 18 64` (Set the resonance (Q) of a low pass filter for agent 3 to 0.5)|
+| Send Audio Synth Note | `/agents/audio/synth/note` | `agent_id bank note velocity` | Send a MIDI note command the audio synthesizer of an agent with ID=`agent_id`. If `velocity` is zero this is a `note off`, and a `note on` otherwise. `bank` is always zero for now and `velocity` different from zero do not affect the gain yet, only trigger the note. | `/agents/audio/synth/note 3 0 69 64` (Send a `note on` message for agent 3 to play A4 note (440 Hz) with a velocity of 64.)) |
+| Flush Audio Synth| `/agents/audio/synth/flush`| `agent_id bank` | Flush the audio synthesizer (release hanging notes) for agent with ID = `agent_id`. `bank` is always zero for now. | `/agents/audio/synth/flush 3 0` (Flush the synthesizer for agent 3) |
+| Set Audio Listener Position| `/audio/listener/position` | `x y z`  | Set the position for the audio listener (if visualized, this is a 3D head enclose in cube) to an specific place (in mm) to perceive spatial audio from that point. | `/audio/listener/position 100 200 -300` (Set the audio listener to the position (100, 200, -300)) |
+
+### Recording Module for OSC messages (Incoming and Outgoing)
+
+| Description | Address | Parameters | Usage | Examples |
+|---|---|---|---|---|
+| Start Recording | `/recorder/start`| `file_path` | Begin a recording session, saving to the specified path.  | `/recorder/start c:\\files` (Start a recording session a save the result in "c:\\files")
+| Stop Recording | `/recorder/stop` | | Stop the current recording session. | `/recorder/stop` (Stop the recording session)
+| Request Time | `/time`| | Request the current time that is running from the starting of the **HS-ims app** in milliseconds.  | `/time` (Request the current time in ms) |
+
+## 3.3. Outgoing OSC Messages
+
+### Agent Module
+
+| Description | Address | Parameters | Usage | Examples |
+|---|---|---|---|---|
+| Report Agent Position By ID | `/agents/position/id`| `id0 x0 y0 z0 id1 x1 y1 z1...` | Report agents' positions (in mm) by ID. For now, only cube agents can report position when they are moved in the **HS-ims app**. As we use the mouse pointer, you can expect only one agent. | `/agents/position/id 1000 100 -230 60` (Position from agent 1000 at (100, -230, 60)) |
+| Report Agent Control | `/agents/control` | `agent_id control_type control_value` | Report a control action (mouse clicks for now) over an agent. | `/agents/control 5 1 1` (Report the `press` action of the right mouse click over agent 5) |
+| Receive Local Communication Messages| `/agents/localcomm/recv` | `id_receiver0 id_sender0 msg0 id_receiver1 id_sender1 msg1...` | Receive local communication messages intended for specific agents. When a agent receive a local packet, this is reported through this message, in some cases, several agents can receive a message at the same time, if so, we can collect these messages at once.  | `/agents/localcomm/recv 3 1 "hello" 5 2 "bye"` (Two agents, 3 and 5, receive a local message at the same time from agents 1 and 2 respectively. Agents 3 received "hello" and agent 5 received "bye")|
+
+### Boundary Module
+
+| Description | Address | Parameters | Usage | Examples |
+|---|---|---|---|---|
+| Report Boundary Event | `/boundary/event/id` | `agent_id boundary_id event_type` | Notify about agent's interaction with a boundary. | `/boundary/event/id 12 3 0` (Notify that agent 12 entered to boundary 3) |
+
+### Audio Module
+
+| Description | Address | Parameters | Usage | Examples |
+|---|---|---|---|---|
+| Report Audio Listener Position | `/audio/listener/position` | `x y z` |Report the position for the audio listener (if visualized, this is a 3D head enclose in cube) in an specific place (in mm) to perceive spatial audio from that point. This is reported only when it is moved with the mouse pointer. | `/audio/listener/position 100 200 -300` (Report the audio listener position (100, 200, -300)) |
+
+
