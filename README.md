@@ -14,22 +14,64 @@ This repository contains examples that use this **HS-ims app** considering three
 
 ## 1. The **Human-Swarm Interactive Music System App (HS-ims app)**
 
+### 1.1. Description
+
 This software is intended for research conducted in multi-agent systems for sound and music applications that have a user interaction component, considered mainly for studying swarm intelligence and self-synchronization strategies. Moreover, it can be known as an *artifact* to perform experimentation.
 
 It is implemented in the [Unity](https://unity.com/) game engine since the intention is to reach several platforms including mobile and XR. So far, we have this version for Windows and Mac PCs. The software is still under development and the code will be released in the future. 
 
 This app serves mainly for three purposes: 
-**visualization**, **human interaction**, and **data collection** regarding objects that moves in a virtual 3D space. In the image below you can visualize this 3D environment with two objects, an sphere and a cube. 
+**visualization**, **human interaction**, and **data collection** regarding objects that moves in a virtual 3D space. In the image below you can visualize this 3D environment where you can navigate using the scroll, center, and right mouse button.  You can find the following components in this screenshot: two objects instantiated externally, a cyan sphere and a cube; a 3D head model enclosed in a cube, which is the *audio listener* reference; and a user interface with few options explained later. 
 
-[image 3D sphere and cube]
+![hs-ims-main-iterface](https://github.com/pedro-lucas-bravo/human_swarm_examples/tree/main/docs/imgs/hs-ims-main-iterface.png)
 
-These two objects were created by another software (let's call it *X app*) that sent the corresponding OSC messages to instantiate and place them in an specific (x, y, z) point. Both objects can be clicked (left or right button in the mouse) and only the cube can be moved in the plane of its faces using the mouse, these interactions can be sent back to *X app* if needed, which allows a two-way communication. As OSC messages are based on UDP, the **HS-ims app** and *X app* can reside in different machines connected through the network. We are exemplifying in this repository this two-way communication with the three programming languages used in the examples ([Python](https://www.python.org/), [C++](https://cplusplus.com/), and [Max 8](https://cycling74.com/products/max). At the end, we are going to describe the OSC API that allows you to use the **HS-ims app** and understand the examples in this repository.
+The two cyan objects were created by another software (let's call it *X app*) that sent the corresponding OSC messages to instantiate and place them in an specific (x, y, z) point. Both objects can be clicked (left or right button in the mouse) and only the cube can be moved in the plane of its faces using the mouse, these interactions can be sent back to *X app* if needed, which allows a two-way communication. As OSC messages are based on UDP, the **HS-ims app** and *X app* can reside in different machines connected through the network. We are exemplifying in this repository this two-way communication with the three programming languages used in the examples ([Python](https://www.python.org/), [C++](https://cplusplus.com/), and [Max 8](https://cycling74.com/products/max). At the end, we are going to describe the OSC API that allows you to use the **HS-ims app** and understand the examples in this repository.
+
+The *audio listener* object can be moved as the cyan cube and is able to change the spatial audio reference when we are synthesizing sound through the app.
+
+The user interface on top left can be shown by clicking the button `CONFIG` (in the image above the button is not there since it was already clicked). There are few configuration options, which are:
+
+* `My IP`: It shows the IP address where the app is running, which must be know if we are sending OSC messages from an external machine.
+
+* `Local Port`: It is the port used for incoming OSC messages. You can change the default value if needed.
+
+* `Center Camera`: Press it to place the virtual camera at the default position.
+
+* `Center Listener`: Press it to place the *audio listener* in the center of the coordinate system.
+
+* `Remove All`: Remove all the agents in the virtual world.
+
+* `Show Listener Always`: Show or hide the *audio listener* 3D object.
+
+* `Show Agents IDs`: Show or hide a white label in an agent that denotes its ID number. 
+
+* `File Path`: Write here the directory where the system will save files from data collection.
+
+* `Check File Path`: Press this button to verify that the `File Path` exist. You should see a message regarding this inquiry to the left of this button.
+
+* `Start`: Start the data collection process and file recording.
+
+* `Stop`: Stop the data collection process and file recording.
+
+* `Save and Close`: Save the settings that you change in this panel and close it.
+
+Additionally, when you connected an external client via OSC messages, you can see the IP address of this remote client in the bottom left of the window.
+
+
+
+### 1.2. Basic Interface
 
 ## 2. How to run the examples
+
+We assume that you have a basic knowledge of the programming languages listed below and a working environment in your machine for the ones that you are interested in. These examples has been tested on Windows, but they should work on Mac OS with particular considerations (specially for the C++ example).
+
+Previous to run the examples, open the **HS-ims app** according to your OS (You can download it from the links above or [here](https://github.com/pedro-lucas-bravo/human_swarm_examples/releases/tag/v1.0.0))
 
 <!--..... open the **HS-ims app** for all, these were implemented  and tested in windows, so find a way to work with max) -->
 
 ### 2.1. MAX
+
+We used [Max](https://cycling74.com/products/max) version 8.6.4.
 
 ### 2.2. Python
 
@@ -55,7 +97,7 @@ These two objects were created by another software (let's call it *X app*) that 
 
   `0`: *Teleport* <sub>The agent with this mode will move instantaneously to an (x, y, z) position assigned.</sub>\
   `1`: *Follow* <sub>The agent will mode towards an (x, y, z) positions with certain speed.</sub>\
-  `2`: *Velocity* <sub>The agent will move with a velocity vector (vx, vy, vz). Remember that teh velocity vector denote direction and speed.</sub>
+  `2`: *Velocity* <sub>The agent will move with a velocity vector (vx, vy, vz). Remember that the velocity vector denote direction and speed.</sub>
 
 - **initPosMode**\
   Initial mode for place agents when they are added (see `/agents/add`):
@@ -121,6 +163,12 @@ Specifies the audio synthesizer ID parameter to modify. Depending of the paramet
 
   ## 3.2. Incoming OSC Messages
 
+  ### Network Module
+
+| Description | Address | Parameters | Usage | Examples |
+|---|---|---|---|---|
+| Connect client | `/connect` | `local_ip  local_port`| Request a connection with the app and share the `local_ip` and  `local_port` of the machine that you want to communicate with the app. If you are using the same machine, you can use `127.0.0.1` as `local_ip`. | `/connect 192.0.0.3 6010` (Connect from a machine with ip=192.0.0.3 willing to receive data on port 6010)|
+
   ### Agent Module
 
 | Description | Address | Parameters | Usage | Examples |
@@ -181,6 +229,12 @@ Specifies the audio synthesizer ID parameter to modify. Depending of the paramet
 | Request Time | `/time`| | Request the current time that is running from the starting of the **HS-ims app** in milliseconds.  | `/time` (Request the current time in ms) |
 
 ## 3.3. Outgoing OSC Messages
+
+ ### Network Module
+
+| Description | Address | Parameters | Usage | Examples |
+|---|---|---|---|---|
+| Report Client Connection | `/test/alive/` | `local_ip  local_port OK`| Report a connection with the app and share the `local_ip` and  `local_port` of the machine that you want to communicate with the app. If you are using the same machine, you will receive `127.0.0.1` as `local_ip`. | `/test/alive/ 192.0.0.3 6010 OK` (Report a connection to a machine with ip=192.0.0.3 willing to receive data on port 6010, so this machine should receive this message)|
 
 ### Agent Module
 
