@@ -14,8 +14,6 @@ This repository contains examples that use this **HS-ims app** considering three
 
 ## 1. The **Human-Swarm Interactive Music System App (HS-ims app)**
 
-### 1.1. Description
-
 This software is intended for research conducted in multi-agent systems for sound and music applications that have a user interaction component, considered mainly for studying swarm intelligence and self-synchronization strategies. Moreover, it can be known as an *artifact* to perform experimentation.
 
 It is implemented in the [Unity](https://unity.com/) game engine since the intention is to reach several platforms including mobile and XR. So far, we have this version for Windows and Mac PCs. The software is still under development and the code will be released in the future. 
@@ -23,7 +21,7 @@ It is implemented in the [Unity](https://unity.com/) game engine since the inten
 This app serves mainly for three purposes: 
 **visualization**, **human interaction**, and **data collection** regarding objects that moves in a virtual 3D space. In the image below you can visualize this 3D environment where you can navigate using the scroll, center, and right mouse button.  You can find the following components in this screenshot: two objects instantiated externally, a cyan sphere and a cube; a 3D head model enclosed in a cube, which is the *audio listener* reference; and a user interface with few options explained later. 
 
-![hs-ims-main-iterface](https://github.com/pedro-lucas-bravo/human_swarm_examples/tree/main/docs/imgs/hs-ims-main-iterface.png)
+![hs-ims-main-iterface](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/docs/imgs/hs-ims-main-interface.png)
 
 The two cyan objects were created by another software (let's call it *X app*) that sent the corresponding OSC messages to instantiate and place them in an specific (x, y, z) point. Both objects can be clicked (left or right button in the mouse) and only the cube can be moved in the plane of its faces using the mouse, these interactions can be sent back to *X app* if needed, which allows a two-way communication. As OSC messages are based on UDP, the **HS-ims app** and *X app* can reside in different machines connected through the network. We are exemplifying in this repository this two-way communication with the three programming languages used in the examples ([Python](https://www.python.org/), [C++](https://cplusplus.com/), and [Max 8](https://cycling74.com/products/max). At the end, we are going to describe the OSC API that allows you to use the **HS-ims app** and understand the examples in this repository.
 
@@ -57,11 +55,15 @@ The user interface on top left can be shown by clicking the button `CONFIG` (in 
 
 Additionally, when you connected an external client via OSC messages, you can see the IP address of this remote client in the bottom left of the window.
 
+## 2. Examples and How to Run Them
 
+### 2.1. Examples Description
 
-### 1.2. Basic Interface
+Some of the examples here are developed in more than one language and might have different implementation approaches, but so far, we have two main examples to look at:
 
-## 2. How to run the examples
+* **Attractors and Repellers:** In this example, agents are rotating over the surface of a sphere that surrounds an object (cyan cube) in a random direction and axis. If a user move this central object, agents will be still stick to it, so this object will be an *attractor*. Agents move to the closer attractor. Additionally, there is a type of objects (red cube) with a bigger radius that, when close to agents, it repels them from their current center, it is the *repeller*. Users can interact only moving attractors and repellers to change the emergent behaviour of the agents. As explained before, agents start around a center with a random axis and with zero speed, they use local communication to share their current angle regarding their center and local axis to other agents, then agents that receive this data modify their speed to move around, which can result in faster or slower movements depending on the configuration regarding attractors, repellers, and other agents. Audio mappings are added to sonify this swarm behaviour.
+
+* **Swarmalators:** This example is based on a model that couples oscillators and spatial positions. They are "oscillators that sync and swarm" or in short "swarmalators", proposed and studied by O'keeffe at al ([paper here](https://www.nature.com/articles/s41467-017-01190-3)). There are several patterns achieved by these set of agents depending on certain parameters. We explore how a user can interact with a group of agents by changing those parameters and participating as one more "swarmalator" in the group. Some implementations in this repository map the swarmalators' dynamics to sound, demonstrating an emergent output from the multiple interactions of the agents.
 
 We assume that you have a basic knowledge of the programming languages listed below and a working environment in your machine for the ones that you are interested in. These examples has been tested on Windows, but they should work on Mac OS with particular considerations (specially for the C++ example).
 
@@ -71,13 +73,57 @@ Previous to run the examples, open the **HS-ims app** according to your OS (You 
 
 ### 2.1. MAX
 
-We used [Max](https://cycling74.com/products/max) version 8.6.4.
+**Requirements:** 
+* *You need to add the [odot](https://cycling74.com/packages/odot) package to your Max installation. This package is used to manage OSC bundles.*
+
+**How to run:**
+
+Open the  **HS-ims app** then, open [Max](https://cycling74.com/products/max). We used [Max](https://cycling74.com/products/max) 8.6.4, but it should work for later versions. Try any of the next examples:
+
+* **[attractors_repellers](https://github.com/pedro-lucas-bravo/human_swarm_examples/tree/main/max/attractors_repellers)**: Activate the audio in Max and press the toggle pointed by the `START HERE` label to run or stop the system. Try the interactive objects in the **HS-ims app** while is running. Alternatively, you can change parameters in Max (e.g stop, then change the number of agents, then run again). This example uses the Max capabilities for sound synthesis, so the **HS-ims app** serves only as visualization and interaction.
+
+* **[swarmalators](https://github.com/pedro-lucas-bravo/human_swarm_examples/tree/main/max/swarmalators/swarmalators)**: Activate the audio in Max (needed to use a sound oscillator to update the agents' color) and press the toggle pointed by the `2. START HERE ON - OFF` label to run or stop the system. This example does not produce any sound and is fixed to 30 agents in 'active phase wave' mode. It would require a fair knowledge of Max and the understanding of the example for trying different parameter values.
 
 ### 2.2. Python
 
+**Requirements:**
+
+* *[numpy](https://numpy.org/)*
+* *[python-osc](https://pypi.org/project/python-osc/)*
+* *Any other package that is not part of your installation in case you find missing imports when running the examples.*
+
+**How to run:**
+
+Open the  **HS-ims app** then, go to the corresponding folder of the example you want to run. We used Python 3.11.5. Try any of the following examples:
+
+
+* **[attractors_repellers](https://github.com/pedro-lucas-bravo/human_swarm_examples/tree/main/python/attractors_repellers)**: Open a terminal in the **attractors_repellers** folder from the Python examples. Run the file `main.py` (`python main.py`). When it prompts `Enter a command:` write `run`. You will se the system running in the **HS-ims app**. If you write `clean`, everything will be removed. If you write `a x` where `x` is a number, you set the angular speed of all agents (e.g `a 0` set everyone to zero speed). Write `exit` to finish the program.
+
+* **[swarmalators](https://github.com/pedro-lucas-bravo/human_swarm_examples/tree/main/python/swarmalators)**:  Open a terminal in the **attractors_repellers** folder from the Python examples. Run any of the following files:
+  >* **[main.py](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/python/swarmalators/main.py)**: Run all agents in a single thread.
+  >* **[main_.py](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/python/swarmalators/multi_main.py)**: Run all agents in a multithread thread setting (run faster).
+
+After running you will see a simple user interface to control the swarmalators parameters. If you want to try audio, find in any of the main files the flag `USE_AUDIO = False` and change it to `True`. Consider that, as you increase the agents, the system will run slower from the python side mostly, but if you add sound, the **HS-ims app** will run slower and you will be able to hear audio artifacts (e.g. clicks, pops, etc) when there are many agents, depending on the capacity of your machine.
+
+To stop and remove everything just close the simple user interface.
+
 ### 2.3. C++
 
-...
+This example was run in Windows, so it is up to you to figure out how to run in Mac OS.
+
+**Requirements:**
+
+* *Visual studio 2022 (Install the module `Desktop development with C++`)*
+* *DirectX 12*
+* If you want to run in Mac, figure out and perform the necessary modifications to make these two integrated library works in the project:
+  >* [oscpack](http://www.rossbencina.com/code/oscpack) (The most important modification is how to manage sockets)
+  >* [imgui](https://github.com/ocornut/imgui/wiki/Getting-Started) (You might need to use a graphic engine different than DirectX 12)
+
+**How to run:**
+
+Open the  **HS-ims app** then, go to the corresponding folder of the example you want to run. Try the following example (we have only one so far):
+
+* **[swarmalators](https://github.com/pedro-lucas-bravo/human_swarm_examples/tree/main/c%2B%2B/swarmalators)**: Open the `.vcxproj` file with Visual Studio, then run the project from there. You will see a simple user interface to control the swarmalators parameters. If you want to try audio, find in the `main.cpp` file the definition `#define USE_AUDIO 0` and change the `0` to `1`. Consider that, as you increase the agents, the system will run slower from the C++ side mostly, although it is considerably much more faster than the Python example comparing through the number of agents. However, if you add sound, the **HS-ims app** will run slower and you will be able to hear audio artifacts (e.g. clicks, pops, etc) when there are many agents, depending on the capacity of your machine.
 
 ## 3. HS-ims app: OSC API Documentation
 
@@ -167,7 +213,7 @@ Specifies the audio synthesizer ID parameter to modify. Depending of the paramet
 
 | Description | Address | Parameters | Usage | Examples |
 |---|---|---|---|---|
-| Connect client | `/connect` | `local_ip  local_port`| Request a connection with the app and share the `local_ip` and  `local_port` of the machine that you want to communicate with the app. If you are using the same machine, you can use `127.0.0.1` as `local_ip`. | `/connect 192.0.0.3 6010` (Connect from a machine with ip=192.0.0.3 willing to receive data on port 6010)|
+| Connect client | `/connect` | `local_ip local_port` | Request a connection with the app and share the `local_ip` and  `local_port` of the machine that you want to communicate with the app. If you are using the same machine, you can use `127.0.0.1` as `local_ip`. | `/connect 192.0.0.3 6010` (Connect from a machine with ip=192.0.0.3 willing to receive data on port 6010)|
 
   ### Agent Module
 
