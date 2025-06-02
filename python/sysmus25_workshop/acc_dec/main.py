@@ -31,6 +31,19 @@ def interative_agents_position_handler(address, *args):
 
 
 
+########## START: Helpers ##########
+
+def agent_radius_msg(osc_msg_radius, agent):
+    osc_msg_radius.add_arg(agent.id)  # Add the agent's ID to the message
+    osc_msg_radius.add_arg(agent.local_radius)
+    osc_msg_radius.add_arg(0.1)  # 0.1: alpha for the radius color
+    color = "00ffff" if agent.type == 0 else "ff0000"  # 00ff00: color in hex format (green) for autonomous agents, ff0000: red for user controlled agents
+    osc_msg_radius.add_arg(color)  # ff0000: color in hex format (red)
+
+########## END: Helpers ##########
+
+
+
 ############# START: 1 NETWORK #############
 
 # Unity app network configuration
@@ -83,13 +96,15 @@ def Instantiate_Boundary_msg():
     
     return osc_msg
 
-def Instantiate_agents_msg(num_agents, limit_radius, shape):
+def Instantiate_agents_msg(num_agents, local_radius, limit_radius, shape):
     global AGENTS
     global CURRENT_AGENT_ID_COUNT
     # Create message for agents instantiation and positioning
     bundle_agents = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
     osc_msg_inst = osc_message_builder.OscMessageBuilder(address="/agents/instantiate/id")
     osc_msg_pos = osc_message_builder.OscMessageBuilder(address="/agents/position/id")
+    #ADDED
+    osc_msg_radius = osc_message_builder.OscMessageBuilder(address="/agents/radius/id")
     bundle_audio = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
 
     osc_msg_inst.add_arg(shape)  # 0: shape=0 for sphere 1 for cube
@@ -98,7 +113,7 @@ def Instantiate_agents_msg(num_agents, limit_radius, shape):
         CURRENT_AGENT_ID_COUNT = CURRENT_AGENT_ID_COUNT + 1
         # Generate a random position within the limit radius
         init_position = Utils.random_position_within_radius(limit_radius)
-        agent = Agent.Agent(id = CURRENT_AGENT_ID_COUNT, init_position= init_position, speed=random.uniform(1000, 3000), limit_radius=limit_radius, type=shape)  # speed is arbitrary, can be adjusted
+        agent = Agent.Agent(id = CURRENT_AGENT_ID_COUNT, init_position= init_position, speed=random.uniform(1000, 3000), local_radius=local_radius, limit_radius=limit_radius, type=shape)  # speed is arbitrary, can be adjusted
         AGENTS[CURRENT_AGENT_ID_COUNT] = agent
         # accumulate ids in the message
         osc_msg_inst.add_arg(CURRENT_AGENT_ID_COUNT)
@@ -108,6 +123,9 @@ def Instantiate_agents_msg(num_agents, limit_radius, shape):
         osc_msg_pos.add_arg(init_position[0])
         osc_msg_pos.add_arg(init_position[1])
         osc_msg_pos.add_arg(init_position[2])
+
+        #ADDED: Add the agent's radius to the radius message
+        agent_radius_msg(osc_msg_radius, agent)
 
         #Collect the audio bundle for the agent
         oscType = 0 if shape == 0 else 2  # 0: Sine wave for autonomous agents, 1: Saw wave for user controlled agents
@@ -120,10 +138,11 @@ def Instantiate_agents_msg(num_agents, limit_radius, shape):
     # Add to agents' instantiation bundle
     bundle_agents.add_content(osc_msg_inst.build())
     bundle_agents.add_content(osc_msg_pos.build())
+    bundle_agents.add_content(osc_msg_radius.build())  #ADDED: Add the radius message to the bundle
     bundle_agents.add_content(bundle_audio.build())
     return bundle_agents
 
-def Instantiate_Objects(client, num_agents_autonomous, num_agents_user_controlled):
+def Instantiate_Objects(client, num_agents_autonomous, num_agents_user_controlled, local_radius):
     #Create instantiation bundle
     instantiation_bundle = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
 
@@ -131,8 +150,8 @@ def Instantiate_Objects(client, num_agents_autonomous, num_agents_user_controlle
     instantiation_bundle.add_content(Instantiate_Boundary_msg().build())
 
     #Message for agents instantiation
-    instantiation_bundle.add_content(Instantiate_agents_msg(num_agents_autonomous, BOUNDARY['radius'], shape=0).build())  # 0: shape=0 for sphere
-    instantiation_bundle.add_content(Instantiate_agents_msg(num_agents_user_controlled, BOUNDARY['radius'], shape=1).build())  # 1: shape=1 for cube
+    instantiation_bundle.add_content(Instantiate_agents_msg(num_agents_autonomous, local_radius, BOUNDARY['radius'], shape=0).build())  # 0: shape=0 for sphere
+    instantiation_bundle.add_content(Instantiate_agents_msg(num_agents_user_controlled, local_radius, BOUNDARY['radius'], shape=1).build())  # 1: shape=1 for cube
 
     #Send the instantiation bundle
     client.send(instantiation_bundle.build())
@@ -145,6 +164,7 @@ def Instantiate_Objects(client, num_agents_autonomous, num_agents_user_controlle
 
 # Config params
 DELTA_TIME = 30 # in ms
+LOCAL_RADIUS = 1000  # Local radius for agents, can be adjusted
 
 #Gobal state variables
 RUNNING = False
@@ -154,9 +174,10 @@ def Global_Behaviour(client):
     global AGENTS
     global DELTA_TIME
     global RUNNING
+    global LOCAL_RADIUS 
 
     # Initialization
-    Instantiate_Objects(client, 5, 2)  # Instantiate 5 agents
+    Instantiate_Objects(client, 5, 2, 3000)  # Instantiate 5 agents
 
     # Update the agents behaviour
     while RUNNING:
@@ -246,6 +267,20 @@ while True:
                         agent = AGENTS[agentId]
                         agent.set_speed_factor(speed_factor)
                 print("All agents speed factor set to:", speed_factor)
+            except:
+                print("Invalid command")
+        #if command contains "r" as the first word and then a number, it will set the loca radius of all agents
+        elif command[0] == "r" and command[1:].strip().isdigit():
+            try:
+                radius = float(command[1:])
+                with lock:
+                    osc_msg_radius = osc_message_builder.OscMessageBuilder(address="/agents/radius/id")
+                    for agentId in AGENTS:
+                        agent = AGENTS[agentId]
+                        agent.local_radius = radius
+                        agent_radius_msg(osc_msg_radius, agent)
+                    client.send(osc_msg_radius.build())
+                print("All agents radius set to:", radius)
             except:
                 print("Invalid command")
         elif command == "clean":
