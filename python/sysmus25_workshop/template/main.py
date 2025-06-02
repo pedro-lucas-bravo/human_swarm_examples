@@ -1,0 +1,275 @@
+import Utils
+import Agent
+#https://pypi.org/project/python-osc/ 
+from pythonosc import udp_client
+from pythonosc.dispatcher import Dispatcher
+from pythonosc import osc_server
+from pythonosc import osc_bundle_builder
+from pythonosc import osc_message_builder
+
+import random
+import math
+import threading
+import time
+
+lock = threading.Lock()
+
+
+
+########## START: OSC Receivers ##########
+
+def connection_answer_handler(address, *args):
+    print(f"\nConnected: {args}\n")
+
+def interative_agents_position_handler(address, *args):
+    global AGENTS
+    (id, x, y, z) = args # We are assuming that one only agent is sent at a time
+    with lock:
+        AGENTS[id].position = [x, y, z]  # Update the agent's position
+    print(f"Agent {id} position updated to: ({x}, {y}, {z})")
+
+########## END: OSC Receivers ##########
+
+
+
+############# START: 1 NETWORK #############
+
+# Unity app network configuration
+external_ip = "127.0.0.1"
+external_port = 6011
+
+# This PC network configuration
+local_ip = "127.0.0.1"
+local_port = 6010
+
+# Create the client
+client = udp_client.SimpleUDPClient(external_ip, external_port)
+
+# Create the listener
+dispatcher = Dispatcher()
+
+# Deine OSC mapping receivers
+dispatcher.map("/test/alive/", connection_answer_handler)
+dispatcher.map("/agents/position/id", interative_agents_position_handler)
+
+# Create the server in a parallel thread
+server = osc_server.ThreadingOSCUDPServer((local_ip, local_port), dispatcher)
+print("Serving on {}".format(server.server_address))
+server_thread = threading.Thread(target=lambda: server.serve_forever())
+server_thread.start()
+
+############# END: 1 NETWORK #############
+
+
+
+############# START: 2 INSTANTIATION #############
+
+BOUNDARY = {'position': {'x': 0, 'y': 0, 'z': 0}, 'radius': 10000, 'alpha': 0.1, 'color': '00ff00'} # Boundary of the world
+AGENTS = {}
+CURRENT_AGENT_ID_COUNT = 0
+
+
+def Instantiate_Boundary_msg():
+    global BOUNDARY
+    # Message for boundary instantiation
+    osc_msg = osc_message_builder.OscMessageBuilder(address="/boundary/add/id")
+    osc_msg.add_arg(0)  # ID = 0
+    osc_msg.add_arg(0)  # 0: type=sphere
+    osc_msg.add_arg(BOUNDARY['position']['x'])
+    osc_msg.add_arg(BOUNDARY['position']['y'])
+    osc_msg.add_arg(BOUNDARY['position']['z'])
+    osc_msg.add_arg(BOUNDARY['radius'])
+    osc_msg.add_arg(BOUNDARY['alpha'])  # color transparency
+    osc_msg.add_arg(BOUNDARY['color'])  # color in hex format   
+    
+    return osc_msg
+
+def Instantiate_agents_msg(num_agents, limit_radius, shape):
+    global AGENTS
+    global CURRENT_AGENT_ID_COUNT
+    # Create message for agents instantiation and positioning
+    bundle_agents = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
+    osc_msg_inst = osc_message_builder.OscMessageBuilder(address="/agents/instantiate/id")
+    osc_msg_pos = osc_message_builder.OscMessageBuilder(address="/agents/position/id")
+    bundle_audio = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
+
+    osc_msg_inst.add_arg(shape)  # 0: shape=0 for sphere 1 for cube
+    osc_msg_inst.add_arg(0)  # 0: movMode=teleport
+    for i in range(num_agents):
+        CURRENT_AGENT_ID_COUNT = CURRENT_AGENT_ID_COUNT + 1
+        # Generate a random position within the limit radius
+        init_position = Utils.random_position_within_radius(limit_radius)
+        agent = Agent.Agent(id = CURRENT_AGENT_ID_COUNT, init_position= init_position, speed=random.uniform(1000, 3000), limit_radius=limit_radius, type=shape)  # speed is arbitrary, can be adjusted
+        AGENTS[CURRENT_AGENT_ID_COUNT] = agent
+        # accumulate ids in the message
+        osc_msg_inst.add_arg(CURRENT_AGENT_ID_COUNT)
+
+        # Add the agent's initial position to the position message
+        osc_msg_pos.add_arg(CURRENT_AGENT_ID_COUNT)
+        osc_msg_pos.add_arg(init_position[0])
+        osc_msg_pos.add_arg(init_position[1])
+        osc_msg_pos.add_arg(init_position[2])
+
+        #Collect the audio bundle for the agent
+        oscType = 0 if shape == 0 else 2  # 0: Sine wave for autonomous agents, 1: Saw wave for user controlled agents
+        bundle_audio.add_content(agent.MusicalAgent.InstantiationBundle(oscType=oscType).build())  # 0: Sine wave        
+        #Play inmediately the agent's sound
+        bundle_audio.add_content(agent.MusicalAgent.PlayMsg().build())
+        #Assign a random frequency to the agent's sound
+        agent.MusicalAgent.BaseFrequency = random.uniform(100, 1000)  # Random frequency between 100 and 1000 Hz
+
+    # Add to agents' instantiation bundle
+    bundle_agents.add_content(osc_msg_inst.build())
+    bundle_agents.add_content(osc_msg_pos.build())
+    bundle_agents.add_content(bundle_audio.build())
+    return bundle_agents
+
+def Instantiate_Objects(client, num_agents_autonomous, num_agents_user_controlled):
+    #Create instantiation bundle
+    instantiation_bundle = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
+
+    #Message for boundary instantiation
+    instantiation_bundle.add_content(Instantiate_Boundary_msg().build())
+
+    #Message for agents instantiation
+    instantiation_bundle.add_content(Instantiate_agents_msg(num_agents_autonomous, BOUNDARY['radius'], shape=0).build())  # 0: shape=0 for sphere
+    instantiation_bundle.add_content(Instantiate_agents_msg(num_agents_user_controlled, BOUNDARY['radius'], shape=1).build())  # 1: shape=1 for cube
+
+    #Send the instantiation bundle
+    client.send(instantiation_bundle.build())
+
+############# END: 2 INSTANTIATION #############
+
+
+
+############# START: 3 BEHAVIOUR #############
+
+# Config params
+DELTA_TIME = 30 # in ms
+
+#Gobal state variables
+RUNNING = False
+
+# Update the agents behaviour
+def Global_Behaviour(client):
+    global AGENTS
+    global DELTA_TIME
+    global RUNNING
+
+    # Initialization
+    Instantiate_Objects(client, 5, 2)  # Instantiate 5 agents
+
+    # Update the agents behaviour
+    while RUNNING:
+        bundle = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
+        with lock:
+            for agentId in AGENTS:                
+                agent = AGENTS[agentId]
+
+                #Update agent
+                agent.update(DELTA_TIME)
+
+                #Prepare OSC Agent Position if type is 0 (autonomous)
+                if agent.type == 0:  # Assuming type 0 is autonomous
+                    position = agent.position
+                    osc_msg = osc_message_builder.OscMessageBuilder(address="/agents/position/id")
+                    osc_msg.add_arg(agent.id)
+                    osc_msg.add_arg(position[0])
+                    osc_msg.add_arg(position[1])
+                    osc_msg.add_arg(position[2])
+                    bundle.add_content(osc_msg.build())
+
+                #Update the agent's musical agent
+                osc_msg = agent.MusicalAgent.update(agent.limit_radius, agent.position)
+                bundle.add_content(osc_msg.build())
+                    
+        
+        #Send all agents info to Unity app
+        client.send(bundle.build())
+
+        #sleep delta time of this thread
+        time.sleep(DELTA_TIME / 1000.0)
+
+############# END: 3 BEHAVIOUR #############
+
+
+
+############# START: 4 DESTROY #############
+
+def Remove_All(client):
+    global BOUNDARY   
+    global AGENTS
+    bundle = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)    
+    with lock:
+        # Remove the boundary
+        osc_msg = osc_message_builder.OscMessageBuilder(address="/boundary/remove/id")
+        osc_msg.add_arg(0)  # ID = 0
+        bundle.add_content(osc_msg.build())
+        # Remove all agents
+        for agentId in AGENTS:
+            osc_msg = osc_message_builder.OscMessageBuilder(address="/agents/remove/id")
+            osc_msg.add_arg(agentId)
+            bundle.add_content(osc_msg.build())
+        client.send(bundle.build())
+        # Clean the agents
+        AGENTS = {}
+
+############# END: 4 DESTROY #############
+
+############## USER CONTROL ##############
+
+# Create a loop to catch input from keyboard
+while True:
+    try:
+        # Get the input from the keyboard
+        command = input("Enter a command: ")
+        if command == "connect":
+            # Send the local IP and port to the Unity app for connection
+            client.send_message("/connect", [local_ip, local_port])
+            
+        elif command == "run":
+            # Send the local IP and port to the Unity app for connection
+            client.send_message("/connect", [local_ip, local_port])
+            # Run in a parallel thread the agents behaviour
+            RUNNING = True
+            behaviour_thread = threading.Thread(target=lambda: Global_Behaviour(client))             
+            behaviour_thread.start()
+        elif command == "stop":
+            # Stop the agents behaviour
+            RUNNING = False
+        #if command contains "a" as teh first word and then a number, it will set the angular speed of all agents
+        #WARNING: Be careful if including other commands that start with "a"
+        elif command[0] == "v":
+            try:
+                speed_factor = float(command[1:])
+                with lock:
+                    for agentId in AGENTS:
+                        agent = AGENTS[agentId]
+                        agent.set_speed_factor(speed_factor)
+                print("All agents speed factor set to:", speed_factor)
+            except:
+                print("Invalid command")
+        elif command == "clean":
+            RUNNING = False
+            Remove_All(client)
+            print("All agents cleaned")
+        elif command == "exit":
+            Remove_All(client)
+            # Stop the server
+            server.shutdown()
+            RUNNING = False
+            break
+        else:
+            print("Command does not exist")
+
+            
+    except KeyboardInterrupt:
+        Remove_All(client)
+        # Stop the server
+        server.shutdown()
+        RUNNING = False
+        break
+    time.sleep(0.1)
+
+############## END USER CONTROL ##############
+
