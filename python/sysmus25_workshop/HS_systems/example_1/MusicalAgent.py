@@ -5,9 +5,7 @@ import numpy as np
 class MusicalAgent:
     def __init__(self, id):
         self.id = id
-        self.BaseFrequency = 440.0  # A4
-
-        #Scales to chhoose from
+        #Scales to choose from
         self.scales = [
             #[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],  # ChromaticScale
             #[0, 3, 5, 6, 7, 10],                     # MinorBluesScale
@@ -45,10 +43,13 @@ class MusicalAgent:
 
         #If there is any nearby agent, set the frequency, otherwise set zero frequency
         if len(nearby_agents) == 0:
-            if self._lastNote is not None: 
+            if self._lastNote is not None:
                 last_note = self._lastNote
                 self._lastNote = None
-                return self.OSC_MSG_MidiNote(self.BaseMidiNote + self.scale[last_note], 0)
+                mapping_bundle = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
+                mapping_bundle.add_content(self.OSC_MSG_TEST_DATA("out").build()) 
+                mapping_bundle.add_content(self.OSC_MSG_MidiNote(self.BaseMidiNote + self.scale[last_note], 0).build())
+                return mapping_bundle
             return None
         else:
             # Sound Mapping: Calculate note based on distance from origin
@@ -61,6 +62,7 @@ class MusicalAgent:
                     mapping_bundle.add_content(self.OSC_MSG_MidiNote(self.BaseMidiNote + self.scale[self._lastNote], 0).build()) # Note off the last note
                     mapping_bundle.add_content(self.OSC_MSG_MidiNote(self.BaseMidiNote + self.scale[note_index], 127).build())  # Note on the new note                    
                     mapping_bundle.add_content(self.OSC_MSG_Reverb(reverb_factor).build())
+                    mapping_bundle.add_content(self.OSC_MSG_TEST_DATA("new").build()) 
                     self._lastNote = note_index
                     return mapping_bundle
                 else:
@@ -70,6 +72,7 @@ class MusicalAgent:
                 mapping_bundle = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
                 mapping_bundle.add_content(self.OSC_MSG_MidiNote(self.BaseMidiNote + self.scale[note_index], 127).build())
                 mapping_bundle.add_content(self.OSC_MSG_Reverb(reverb_factor).build())
+                mapping_bundle.add_content(self.OSC_MSG_TEST_DATA("in").build()) 
                 return mapping_bundle
     
     ############## END: Setup variables for note playing #############
@@ -165,6 +168,12 @@ class MusicalAgent:
         osc_msg.add_arg(0)
         osc_msg.add_arg(19) #19 is Reverb room
         osc_msg.add_arg(reverbRoom)
+        return osc_msg
+    
+    def OSC_MSG_TEST_DATA(self, data):
+        osc_msg = osc_message_builder.OscMessageBuilder(address="/data/test")
+        osc_msg.add_arg(self.id)
+        osc_msg.add_arg(data)
         return osc_msg
     
     ############### END: OSC Messages for Musical Agent #############

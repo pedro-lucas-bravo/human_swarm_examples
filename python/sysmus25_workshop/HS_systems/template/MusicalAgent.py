@@ -7,7 +7,7 @@ class MusicalAgent:
         self.id = id
         self.BaseFrequency = 440.0  # A4
 
-    ############# START: Setup variables for note playing #############
+    ############# START: Setup variables for sound playing #############
 
     def InstantiationBundle(self, oscType):
         bundle = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
@@ -31,7 +31,7 @@ class MusicalAgent:
         magnitude = np.linalg.norm(spatial_position)
         return self.OSC_MSG_SetFrequency(self.BaseFrequency * (magnitude / limit_radius))
     
-    ############## END: Setup variables for note playing #############
+    ############## END: Setup variables for sound playing #############
 
 
     ################# START: OSC Messages for Musical Agent #############

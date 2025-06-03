@@ -1,0 +1,3 @@
+# SysMus25 Workshop - Human-Swarm Interactive Music Systems: Implementation and data analysis using Python
+
+Content soon...
