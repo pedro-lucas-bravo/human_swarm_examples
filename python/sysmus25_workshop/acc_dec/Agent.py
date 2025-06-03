@@ -3,7 +3,7 @@ import numpy as np
 import MusicalAgent
 
 class Agent:
-    def __init__(self, id, init_position, speed, local_radius, limit_radius, type):#Units: mm for distance and mm/s for speed
+    def __init__(self, allAgents, id, init_position, speed, local_radius, limit_radius, type):#Units: mm for distance and mm/s for speed
         self.id = id
         self.position = np.array(init_position)
         self.speed = speed
@@ -14,6 +14,10 @@ class Agent:
         self.speed_factor = 1.0
         self.type = type  # Type of agent, e.g., '0:sphere and automous', '1:cube and user controlled', etc.
         self.MusicalAgent = MusicalAgent.MusicalAgent(self.id)
+        self.AllAgents = allAgents
+
+        self.radius_normal_color = "00ffff" if type == 0 else "ff0000"
+        self.radius_detection_color = "ffff00" if type == 0 else "ff00ff"
 
     def detect_limit(self):
         return np.linalg.norm(self.position) > self.limit_radius
@@ -35,6 +39,13 @@ class Agent:
 
     def set_speed_factor(self, speed_factor):
         self.speed_factor = speed_factor
+
+    def get_nearby_agents(self):
+        nearby_agents = []
+        for agent in self.AllAgents.values():
+            if agent.id != self.id and np.linalg.norm(agent.position - self.position) < self.local_radius:
+                nearby_agents.append(agent)
+        return nearby_agents
 
 
 

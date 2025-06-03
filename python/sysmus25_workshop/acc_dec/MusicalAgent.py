@@ -26,10 +26,14 @@ class MusicalAgent:
         velocity = 0 #Note off
         return self.OSC_MSG_MidiNote(note, velocity)
     
-    def update(self, limit_radius, spatial_position):
-        # Sound Mapping: Calculate frequency based on distance from origin
-        magnitude = np.linalg.norm(spatial_position)
-        return self.OSC_MSG_SetFrequency(self.BaseFrequency * (magnitude / limit_radius))
+    def update(self, limit_radius, spatial_position, nearby_agents):        
+        #If there is any nearby agent, set the frquency, otherwise set zero frequency
+        if len(nearby_agents) == 0:
+            return self.OSC_MSG_SetFrequency(0.0)
+        else:
+            # Sound Mapping: Calculate frequency based on distance from origin
+            magnitude = np.linalg.norm(spatial_position)
+            return self.OSC_MSG_SetFrequency(self.BaseFrequency * (magnitude / limit_radius))
     
     ############## END: Setup variables for note playing #############
 

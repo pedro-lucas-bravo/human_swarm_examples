@@ -7,6 +7,8 @@ from pythonosc import osc_server
 from pythonosc import osc_bundle_builder
 from pythonosc import osc_message_builder
 
+import numpy as np
+
 import random
 import threading
 import time
@@ -24,7 +26,7 @@ def interative_agents_position_handler(address, *args):
     global AGENTS
     (id, x, y, z) = args # We are assuming that one only agent is sent at a time
     with lock:
-        AGENTS[id].position = [x, y, z]  # Update the agent's position
+        AGENTS[id].position = np.array([x, y, z])  # Update the agent's position
     print(f"Agent {id} position updated to: ({x}, {y}, {z})")
 
 ########## END: OSC Receivers ##########
@@ -33,12 +35,11 @@ def interative_agents_position_handler(address, *args):
 
 ########## START: Helpers ##########
 
-def agent_radius_msg(osc_msg_radius, agent):
+def agent_radius_msg(osc_msg_radius, agent, color):
     osc_msg_radius.add_arg(agent.id)  # Add the agent's ID to the message
     osc_msg_radius.add_arg(agent.local_radius)
-    osc_msg_radius.add_arg(0.1)  # 0.1: alpha for the radius color
-    color = "00ffff" if agent.type == 0 else "ff0000"  # 00ff00: color in hex format (green) for autonomous agents, ff0000: red for user controlled agents
-    osc_msg_radius.add_arg(color)  # ff0000: color in hex format (red)
+    osc_msg_radius.add_arg(0.1)  # 0.1: alpha for the radius color    
+    osc_msg_radius.add_arg(color) 
 
 ########## END: Helpers ##########
 
@@ -113,7 +114,7 @@ def Instantiate_agents_msg(num_agents, local_radius, limit_radius, shape):
         CURRENT_AGENT_ID_COUNT = CURRENT_AGENT_ID_COUNT + 1
         # Generate a random position within the limit radius
         init_position = Utils.random_position_within_radius(limit_radius)
-        agent = Agent.Agent(id = CURRENT_AGENT_ID_COUNT, init_position= init_position, speed=random.uniform(1000, 3000), local_radius=local_radius, limit_radius=limit_radius, type=shape)  # speed is arbitrary, can be adjusted
+        agent = Agent.Agent(allAgents=AGENTS, id = CURRENT_AGENT_ID_COUNT, init_position= init_position, speed=random.uniform(1000, 3000), local_radius=local_radius, limit_radius=limit_radius, type=shape)  # speed is arbitrary, can be adjusted
         AGENTS[CURRENT_AGENT_ID_COUNT] = agent
         # accumulate ids in the message
         osc_msg_inst.add_arg(CURRENT_AGENT_ID_COUNT)
@@ -125,7 +126,7 @@ def Instantiate_agents_msg(num_agents, local_radius, limit_radius, shape):
         osc_msg_pos.add_arg(init_position[2])
 
         #ADDED: Add the agent's radius to the radius message
-        agent_radius_msg(osc_msg_radius, agent)
+        agent_radius_msg(osc_msg_radius, agent, agent.radius_normal_color)
 
         #Collect the audio bundle for the agent
         oscType = 0 if shape == 0 else 2  # 0: Sine wave for autonomous agents, 1: Saw wave for user controlled agents
@@ -164,7 +165,7 @@ def Instantiate_Objects(client, num_agents_autonomous, num_agents_user_controlle
 
 # Config params
 DELTA_TIME = 30 # in ms
-LOCAL_RADIUS = 1000  # Local radius for agents, can be adjusted
+LOCAL_RADIUS = 3000  # Local radius for agents, can be adjusted
 
 #Gobal state variables
 RUNNING = False
@@ -177,12 +178,13 @@ def Global_Behaviour(client):
     global LOCAL_RADIUS 
 
     # Initialization
-    Instantiate_Objects(client, 5, 2, 3000)  # Instantiate 5 agents
+    Instantiate_Objects(client, 5, 2, LOCAL_RADIUS)  # Instantiate 5 agents
 
     # Update the agents behaviour
     while RUNNING:
         bundle = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
         osc_msg_pos = osc_message_builder.OscMessageBuilder(address="/agents/position/id")
+        osc_msg_radius = osc_message_builder.OscMessageBuilder(address="/agents/radius/id")
         audio_bundle = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
         with lock:
             for agentId in AGENTS:                
@@ -199,12 +201,21 @@ def Global_Behaviour(client):
                     osc_msg_pos.add_arg(position[1])
                     osc_msg_pos.add_arg(position[2])                    
 
+                nearby_agents = agent.get_nearby_agents()
                 #Update the agent's musical agent
-                osc_audio = agent.MusicalAgent.update(agent.limit_radius, agent.position)
+                osc_audio = agent.MusicalAgent.update(agent.limit_radius, agent.position, nearby_agents)
                 audio_bundle.add_content(osc_audio.build())
+
+                #Update the agent's radius color feedback when there are nearby agents
+                if len(nearby_agents) > 0:
+                    agent_radius_msg(osc_msg_radius, agent, agent.radius_detection_color)
+                else:
+                    agent_radius_msg(osc_msg_radius, agent, agent.radius_normal_color)
                     
         bundle.add_content(osc_msg_pos.build())
         bundle.add_content(audio_bundle.build())
+        bundle.add_content(osc_msg_radius.build())
+
         #Send all agents info to Unity app
         client.send(bundle.build())
 
@@ -269,7 +280,7 @@ while True:
                 print("All agents speed factor set to:", speed_factor)
             except:
                 print("Invalid command")
-        #if command contains "r" as the first word and then a number, it will set the loca radius of all agents
+        #Set the radius of all agents
         elif command[0] == "r" and command[1:].strip().isdigit():
             try:
                 radius = float(command[1:])
@@ -277,10 +288,49 @@ while True:
                     osc_msg_radius = osc_message_builder.OscMessageBuilder(address="/agents/radius/id")
                     for agentId in AGENTS:
                         agent = AGENTS[agentId]
+                        LOCAL_RADIUS = radius  # Update the global local radius
                         agent.local_radius = radius
-                        agent_radius_msg(osc_msg_radius, agent)
+                        agent_radius_msg(osc_msg_radius, agent, agent.radius_normal_color)
                     client.send(osc_msg_radius.build())
                 print("All agents radius set to:", radius)
+            except:
+                print("Invalid command")
+        #Instantiate a number of agents
+        elif (command.startswith("ia") or command.startswith("iu")) and command[2:].strip().isdigit():
+            try:
+                num_agents = int(command[2:])
+                with lock:
+                    shape = 0 if command.startswith("ia") else 1  # 0: autonomous agents, 1: user controlled agents
+                    osc_bundle = Instantiate_agents_msg(num_agents, LOCAL_RADIUS, BOUNDARY['radius'], shape=shape)  # 0: shape=0 for sphere
+                client.send(osc_bundle.build())
+                print("Instantiated", num_agents, "agents")
+            except:
+                print("Invalid command")
+        #Remove a number of agents
+        elif (command.startswith("da") or command.startswith("du")) and command[2:].strip().isdigit():
+            try:
+                num_agents = int(command[2:])
+                with lock:
+                    shape = 0 if command.startswith("da") else 1  # 0: autonomous agents, 1: user controlled agents
+                    osc_remove = osc_message_builder.OscMessageBuilder(address="/agents/remove/id")
+                    agentsToRemove = [agentId for agentId in AGENTS if AGENTS[agentId].type == shape]
+                    #Reverse the list
+                    agentsToRemove.reverse()
+                    cremove_count = 0
+                    for i in range(num_agents):
+                        if len(agentsToRemove) == 0:
+                            #print("No agents to remove")
+                            break
+                        # Randomly select an agent to remove
+                        agentId = agentsToRemove[0]
+                        osc_remove.add_arg(agentId)
+                        del AGENTS[agentId]
+                        del agentsToRemove[0]
+                        cremove_count += 1
+                
+                if len(osc_remove.args) != 0:
+                    client.send(osc_remove.build())
+                    print("Removed", cremove_count, "agents")
             except:
                 print("Invalid command")
         elif command == "clean":
