@@ -129,12 +129,8 @@ def Instantiate_agents_msg(num_agents, local_radius, limit_radius, shape):
         agent_radius_msg(osc_msg_radius, agent, agent.radius_normal_color)
 
         #Collect the audio bundle for the agent
-        oscType = 0 if shape == 0 else 2  # 0: Sine wave for autonomous agents, 1: Saw wave for user controlled agents
+        oscType = 0 if shape == 0 else 1  # 0: Sine wave for autonomous agents, 1: Saw wave for user controlled agents
         bundle_audio.add_content(agent.MusicalAgent.InstantiationBundle(oscType=oscType).build())  # 0: Sine wave        
-        #Play inmediately the agent's sound
-        bundle_audio.add_content(agent.MusicalAgent.PlayMsg().build())
-        #Assign a random frequency to the agent's sound
-        agent.MusicalAgent.BaseFrequency = random.uniform(100, 1000)  # Random frequency between 100 and 1000 Hz
 
     # Add to agents' instantiation bundle
     bundle_agents.add_content(osc_msg_inst.build())
@@ -203,8 +199,9 @@ def Global_Behaviour(client):
 
                 nearby_agents = agent.get_nearby_agents()
                 #Update the agent's musical agent
-                osc_audio = agent.MusicalAgent.update(agent.limit_radius, agent.position, nearby_agents)
-                audio_bundle.add_content(osc_audio.build())
+                osc_audio = agent.MusicalAgent.update(agent.limit_radius, agent.position, agent.velocity, nearby_agents)
+                if osc_audio is not None:                    
+                    audio_bundle.add_content(osc_audio.build())
 
                 #Update the agent's radius color feedback when there are nearby agents
                 if len(nearby_agents) > 0:
@@ -270,7 +267,7 @@ while True:
             # Stop the agents behaviour
             RUNNING = False
         #if command contains "v" as the first word and then a number, it will set the speed of all agents
-        elif command[0] == "v" and command[1:].strip().isdigit():
+        elif command[0] == "v" and  Utils.is_float(command[1:].strip()):
             try:
                 speed_factor = float(command[1:])
                 with lock:
@@ -281,7 +278,7 @@ while True:
             except:
                 print("Invalid command")
         #Set the radius of all agents
-        elif command[0] == "r" and command[1:].strip().isdigit():
+        elif command[0] == "r" and Utils.is_float(command[1:].strip()):
             try:
                 radius = float(command[1:])
                 with lock:

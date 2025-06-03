@@ -17,7 +17,9 @@ class Agent:
         self.AllAgents = allAgents
 
         self.radius_normal_color = "00ffff" if type == 0 else "ff0000"
-        self.radius_detection_color = "ffff00" if type == 0 else "ff00ff"
+        self.radius_detection_color = "0000ff" if type == 0 else "ffff00"
+        self.last_position = np.array(init_position)
+        self.velocity = np.array([0.0, 0.0, 0.0])
 
     def detect_limit(self):
         return np.linalg.norm(self.position) > self.limit_radius
@@ -36,6 +38,8 @@ class Agent:
 
             # Update the agent's position based on its speed and delta_time
             self.position += self.dir * self.speed * self.speed_factor * delta_time_s
+        self.velocity = (self.position - self.last_position) / delta_time_s
+        self.last_position = self.position.copy()
 
     def set_speed_factor(self, speed_factor):
         self.speed_factor = speed_factor

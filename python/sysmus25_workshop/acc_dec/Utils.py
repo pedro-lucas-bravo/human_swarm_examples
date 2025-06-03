@@ -12,3 +12,10 @@ def random_position_within_radius(radius, constant_radius=False):
         y = r * math.sin(elv) * math.sin(az)
         z = r * math.cos(elv)
         return [x, y, z]
+
+def is_float(s):
+        try:
+            float(s)
+            return True
+        except ValueError:
+            return False

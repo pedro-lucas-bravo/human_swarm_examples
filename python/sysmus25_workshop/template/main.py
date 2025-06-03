@@ -238,7 +238,7 @@ while True:
             # Stop the agents behaviour
             RUNNING = False
         #if command contains "v" as the first word and then a number, it will set the speed of all agents
-        elif command[0] == "v" and command[1:].strip().isdigit():
+        elif command[0] == "v" and Utils.is_float(command[1:].strip()):
             try:
                 speed_factor = float(command[1:])
                 with lock:
