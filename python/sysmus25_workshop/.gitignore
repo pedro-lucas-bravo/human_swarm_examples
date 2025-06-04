@@ -1,0 +1,2 @@
+#ignore everything inside data_analysis/data
+data_analysis/data/*

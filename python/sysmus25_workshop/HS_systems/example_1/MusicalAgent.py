@@ -46,9 +46,9 @@ class MusicalAgent:
             if self._lastNote is not None:
                 last_note = self._lastNote
                 self._lastNote = None
-                mapping_bundle = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
-                mapping_bundle.add_content(self.OSC_MSG_TEST_DATA("out").build()) 
+                mapping_bundle = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)                 
                 mapping_bundle.add_content(self.OSC_MSG_MidiNote(self.BaseMidiNote + self.scale[last_note], 0).build())
+                mapping_bundle.add_content(self.OSC_MSG_TEST_DATA("out").build())
                 return mapping_bundle
             return None
         else:

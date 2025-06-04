@@ -162,6 +162,8 @@ def Instantiate_Objects(client, num_agents_autonomous, num_agents_user_controlle
 # Config params
 DELTA_TIME = 30 # in ms
 LOCAL_RADIUS = 3000  # Local radius for agents, can be adjusted
+DEFAULT_AUTONOMOUS_AGENTS = 5  # Default number of autonomous agents
+DEFAULT_USER_CONTROLLED_AGENTS = 2  # Default number of user controlled agents
 
 #Gobal state variables
 RUNNING = False
@@ -172,9 +174,11 @@ def Global_Behaviour(client):
     global DELTA_TIME
     global RUNNING
     global LOCAL_RADIUS 
+    global DEFAULT_AUTONOMOUS_AGENTS
+    global DEFAULT_USER_CONTROLLED_AGENTS
 
     # Initialization
-    Instantiate_Objects(client, 5, 2, LOCAL_RADIUS)  # Instantiate 5 agents
+    Instantiate_Objects(client, DEFAULT_AUTONOMOUS_AGENTS, DEFAULT_USER_CONTROLLED_AGENTS, LOCAL_RADIUS)  # Instantiate 5 agents
 
     # Update the agents behaviour
     while RUNNING:
@@ -245,7 +249,37 @@ def Remove_All(client):
 
 ############# END: 4 DESTROY #############
 
-############## USER CONTROL ##############
+############# START: EXPERIMENT SETTING #############
+
+def run_experiment():
+    global RUNNING
+    global DEFAULT_AUTONOMOUS_AGENTS
+
+    duration_per_experiment = 60  # seconds
+    number_of_autonomous_agents = [2, 4, 8, 16, 32]
+    
+    client.send_message("/connect", [local_ip, local_port])    
+    
+    for num_agents in number_of_autonomous_agents:
+        print(f"Running experiment with {num_agents} autonomous agents")
+        client.send_message("/recorder/start", []) # Start recording in Unity app
+        DEFAULT_AUTONOMOUS_AGENTS = num_agents
+        RUNNING = True
+        behaviour_thread = threading.Thread(target=lambda: Global_Behaviour(client))             
+        behaviour_thread.start()
+        time.sleep(duration_per_experiment)  # Run the experiment for the specified duration
+        RUNNING = False
+        behaviour_thread.join()  # Wait for the behaviour thread to finish
+        client.send_message("/recorder/stop", [])  # Stop recording in Unity app
+        time.sleep(1)  # Wait before cleaning up
+        Remove_All(client)
+        print(f"Experiment with {num_agents} autonomous agents completed")
+        time.sleep(1)  # Wait before starting the next experiment
+    print("All experiments completed.")    
+
+############# END: EXPERIMENT SETTING #############
+
+############## USER CONTROL ##############s
 
 # Create a loop to catch input from keyboard
 while True:
@@ -340,6 +374,8 @@ while True:
             server.shutdown()
             RUNNING = False
             break
+        elif command == "experiment":
+            run_experiment()
         else:
             print("Command does not exist")
 
