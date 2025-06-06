@@ -35,7 +35,7 @@ As the emphasis shifts more towards the concepts and abstractions behind this to
         
     * Open a terminal and navigate to the following path:
 
-        `cd <PATH_WHERE_YOU_DOWNLOAD>/mac_ims.app/Contents/MacOS`
+        `cd <DOWNLOAD_PATH>/mac_ims.app/Contents/MacOS`
 
     * Once in this address, execute the following command:
     
@@ -55,7 +55,7 @@ As the emphasis shifts more towards the concepts and abstractions behind this to
 
 ## Running the Examples
 
-1. Download this repository in your machine: https://github.com/pedro-lucas-bravo/human_swarm_examples. For this workshop, you will only need the content found in the folder **<PATH_WHERE_YOU_DOWNLOAD>\human_swarm_examples\python\sysmus25_workshop**
+1. Download this repository in your machine: https://github.com/pedro-lucas-bravo/human_swarm_examples. For this workshop, you will only need the content found in the folder **<DOWNLOAD_PATH>\human_swarm_examples\python\sysmus25_workshop**
 
 2. Open the **HS-ims** app as mentioned in the previous section.
 
@@ -67,7 +67,7 @@ As the emphasis shifts more towards the concepts and abstractions behind this to
 
 
     ```lang-sh
-    <PATH_WHERE_YOU_DOWNLOAD>\human_swarm_examples\python\sysmus25_workshop\HS_systems\template> python .\main.py
+    <DOWNLOAD_PATH>\human_swarm_examples\python\sysmus25_workshop\HS_systems\template> python .\main.py
     ```
 
     You will be prompt the following:
@@ -172,7 +172,7 @@ To demonstrate how this data can be processed and analyzed, we will use files th
 
 https://doi.org/10.5281/zenodo.15602366
 
-Unzip the downloaded file, take the only folder you find there (**/data** folder) and put it under **<PATH_WHERE_YOU_DOWNLOAD>\human_swarm_examples\python\sysmus25_workshop\data_analysis**. Your local directory for your **/sysmus25_workshop/data_analysis** folder should look like this:
+Unzip the downloaded file, take the only folder you find there (**/data** folder) and put it under **<DOWNLOAD_PATH>\human_swarm_examples\python\sysmus25_workshop\data_analysis**. Your local directory for your **/sysmus25_workshop/data_analysis** folder should look like this:
 
 ```shell
 \---[folder]sysmus25_workshop
@@ -194,6 +194,6 @@ After having these files, you can run the Jupyter Notebook [data_analysis_exampl
 
 ## Going Further:
 
-Check the main documentation of [this repository (README.md)](https://github.com/pedro-lucas-bravo/human_swarm_examples) for different examples in Python and other programming languages. Alternative, you can explore additional features of the **HS-ims** app through its [OSC API](https://github.com/pedro-lucas-bravo/human_swarm_examples/tree/main?tab=readme-ov-file#3-hs-ims-app-osc-api-documentation). If you experience any issue or want to provide a comment just contact me at the [Discord channel](https://discord.com/channels/1380190323711414304/1380480825778503801) of SysMus25.
+Check the main documentation of [this repository (README.md)](https://github.com/pedro-lucas-bravo/human_swarm_examples) for different examples in Python and other programming languages. Alternatively, you can explore additional features of the **HS-ims** app through its [OSC API](https://github.com/pedro-lucas-bravo/human_swarm_examples/tree/main?tab=readme-ov-file#3-hs-ims-app-osc-api-documentation). If you experience any issue or want to provide a comment just contact me at the [Discord channel](https://discord.com/channels/1380190323711414304/1380480825778503801) of SysMus25.
 
-**The theoretical material of the workshop will be shared after its completion.**
+**The theoretical material of the workshop will be shared after we finish the session at the conference.**
