@@ -268,6 +268,8 @@ Specifies the audio synthesizer ID parameter to modify. Depending of the paramet
 
 ### Recording Module for OSC messages (Incoming and Outgoing)
 
+**Note:** The timestamp (time) found in the recorded files is given in **seconds** and corresponds to the time since the app was opened.
+
 | Description | Address | Parameters | Usage | Examples |
 |---|---|---|---|---|
 | Start Recording | `/recorder/start`| `file_path` | Begin a recording session, saving to the specified path.  | `/recorder/start c:\\files` (Start a recording session a save the result in "c:\\files")
