@@ -25,11 +25,22 @@ As the emphasis shifts more towards the concepts and abstractions behind this to
 
 * Download the **HS-ims** application for visualization and interaction in a 3D environment according to your operative system:
 
-    * [HS-ims Windows](https://github.com/pedro-lucas-bravo/human_swarm_examples/releases/download/v1.0.0/win_ims.zip) (Open the *Human Swarm IMS.exe* file to check that the app is working)
+    * [HS-ims Windows](https://github.com/pedro-lucas-bravo/human_swarm_examples/releases/download/v1.0.0/win_ims.zip) (Unzip the file and open the *Human Swarm IMS.exe* file to check that the app is working)
 
-    * [HS-ims Mac](https://github.com/pedro-lucas-bravo/human_swarm_examples/releases/download/v1.0.0/mac_ims.zip) (Open the .app file)
+    * [HS-ims Mac](https://github.com/pedro-lucas-bravo/human_swarm_examples/releases/download/v1.0.0/mac_ims.zip) (Unzip the file and open the .app file)
     
-    > MacOS users may encounter issues when attempting to open this app. In this case, open a terminal and run the command `xattr -rc [PATH_TO_APP]` then try to open the app again.
+    > MacOS users may encounter issues when attempting to open this app. In this case, open a terminal and run the command `xattr -rc [PATH_TO_APP]` then try to open the app again. In case it still does not allow you to open the app, try the following:
+        
+    * Open a terminal and navigate to the following path:
+
+        `cd <PATH_WHERE_YOU_DOWNLOAD>/mac_ims.app/Contents/MacOS`
+
+    * Once in this address, execute the following command:
+    
+        `chmod -R 777 "Human Swarm IMS"`
+
+    * Now you should be able to open the app.
+
 
 * For the system part: Install [Python](https://www.python.org/downloads/) >= 3.11.5 with the following packages:
     * [numpy](https://pypi.org/project/numpy/)
@@ -86,6 +97,8 @@ As the emphasis shifts more towards the concepts and abstractions behind this to
 At this point you are ready for the workshop, where more details will be provided. However, you can try some features that you will find in every example as described below.
 
 ### Example: HS_systems/template
+
+If you run successfully this example, you are also able to perform real-time changes in the behavior of the agents in the following way:
 
 [IN CONSTRUCTION]
 
