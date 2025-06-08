@@ -2,6 +2,8 @@
 
 **By: [Pedro Lucas](https://www.mn.uio.no/ifi/english/people/aca/pedroplu/)**
 
+**Please, fill this form before the workshop: https://nettskjema.no/a/527873**
+
 In this repository, you will find the materials necessary for the workshop taking place at [SysMus25](https://www.uio.no/ritmo/english/news-and-events/events/conferences/2025/sysmus25/). The aim of this workshop is to provide fundamental concepts regarding [*human-swarm interactive music systems*](https://www.duo.uio.no/handle/10852/116392), as well as considerations for their design, implementation, and data analysis. The set of examples provided here serves as an explanatory artifact to support this goal. You can further develop the code and construct your own system based on it, or create a new system considering the information shared in the workshop.
 
 As the emphasis shifts more towards the concepts and abstractions behind this topic illustrated in the code example, it is acceptable for you to attend without setting up this environment. However, it would be ideal for you to experience how these types of systems work on your machine. In that regard, please follow this document to ensure that you can run the examples **BEFORE** the workshop. If you encounter any issues, you can contact me at the corresponding [Discord channel](https://discord.com/channels/1380190323711414304/1380480825778503801) from the [SysMus25 server](https://discord.gg/Ja8JDhXC):
