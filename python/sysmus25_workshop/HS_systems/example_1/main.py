@@ -104,7 +104,6 @@ def Instantiate_agents_msg(num_agents, local_radius, limit_radius, shape):
     bundle_agents = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
     osc_msg_inst = osc_message_builder.OscMessageBuilder(address="/agents/instantiate/id")
     osc_msg_pos = osc_message_builder.OscMessageBuilder(address="/agents/position/id")
-    #ADDED
     osc_msg_radius = osc_message_builder.OscMessageBuilder(address="/agents/radius/id")
     bundle_audio = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
 
@@ -125,7 +124,7 @@ def Instantiate_agents_msg(num_agents, local_radius, limit_radius, shape):
         osc_msg_pos.add_arg(init_position[1])
         osc_msg_pos.add_arg(init_position[2])
 
-        #ADDED: Add the agent's radius to the radius message
+        #Add the agent's radius to the radius message
         agent_radius_msg(osc_msg_radius, agent, agent.radius_normal_color)
 
         #Collect the audio bundle for the agent
@@ -239,8 +238,8 @@ def Remove_All(client):
         osc_msg.add_arg(0)  # ID = 0
         bundle.add_content(osc_msg.build())
         # Remove all agents
-        for agentId in AGENTS:
-            osc_msg = osc_message_builder.OscMessageBuilder(address="/agents/remove/id")
+        osc_msg = osc_message_builder.OscMessageBuilder(address="/agents/remove/id")
+        for agentId in AGENTS:            
             osc_msg.add_arg(agentId)
             bundle.add_content(osc_msg.build())
         client.send(bundle.build())
@@ -321,8 +320,6 @@ while True:
                         agent = AGENTS[agentId]
                         LOCAL_RADIUS = radius  # Update the global local radius
                         agent.local_radius = radius
-                        agent_radius_msg(osc_msg_radius, agent, agent.radius_normal_color)
-                    client.send(osc_msg_radius.build())
                 print("All agents radius set to:", radius)
             except:
                 print("Invalid command")
