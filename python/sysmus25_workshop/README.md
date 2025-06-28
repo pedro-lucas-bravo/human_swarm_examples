@@ -63,7 +63,7 @@ As the emphasis shifts more towards the concepts and abstractions behind this to
 
 3. Inside **/sysmus25_workshop** you will find the folder **/HS_systems** with two examples:
     * [/template](https://github.com/pedro-lucas-bravo/human_swarm_examples/tree/main/python/sysmus25_workshop/HS_systems/template): Contains some basic blocks to implement a human-swarm music system.
-    * [/example_1](https://github.com/pedro-lucas-bravo/human_swarm_examples/tree/main/python/sysmus25_workshop/HS_systems/example_1): It is based on the **/template** and contains additional elements. This is the one that will be explained in the workshop.
+    * [/musical_encounters](https://github.com/pedro-lucas-bravo/human_swarm_examples/tree/main/python/sysmus25_workshop/HS_systems/musical_encounters): It is based on the **/template** and contains additional elements. This is the one that will be explained in the workshop.
 
     In any of these folders you will find the script `main.py`. Run first the one inside **/template**. A way to do this is opening a terminal, navigate to the folder **/template** and execute the corresponding command. The following is an example using PowerShell in Windows:
 
@@ -92,9 +92,9 @@ As the emphasis shifts more towards the concepts and abstractions behind this to
 
     You can stop everything by writing `exit` in the console, which will terminate the Python script.
 
-    You can do the same for **example_1** by navigating in the corresponding folder and executing the `main.py` script. In that case, you must observe in the app something like the next image, together with reverberated punctual musical sounds.
+    You can do the same for **musical_encounters** by navigating in the corresponding folder and executing the `main.py` script. In that case, you must observe in the app something like the next image, together with reverberated punctual musical sounds.
 
-    ![example_1](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/docs/imgs/example_1_img.png)
+    ![musical_encounters](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/docs/imgs/musical_encounters_img.png)
 
     Again, you can stop by writing `exit` in the console. You can alternatively kill the terminal and close the **HS-ims** app.
 
@@ -113,7 +113,7 @@ If you run successfully this example, you are also able to perform real-time cha
     All agents speed factor set to: 1.5
     ```
 
-### Example: HS_systems/example_1
+### Example: HS_systems/musical_encounters
 
 This example contains more elements and interactive options. As the **/template** example, you can change the agents' speed in the same way with  `v [factor]`. Additionally, you have the following options: **[Ensure first to start the system with the `run` command after executing the `main.py` script]**
 
@@ -189,10 +189,10 @@ Unzip the downloaded file, take the only folder you find there (**/data** folder
 |   |   |   \---[folder]user_influence
 |   |   |   |       [file]example_1_recording.mp4
 |   |   |   |       [file]ims_2025-06-05_12-12-00.csv
-|   |   [file]data_analysis_example_1.ipynb
+|   |   [file]data_analysis_musical_encounters.ipynb
 ```
 
-After having these files, you can run the Jupyter Notebook [data_analysis_example_1.ipynb](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/python/sysmus25_workshop/data_analysis/data_analysis_example_1.ipynb). Ensure that your Jupyter Notebook instance points to the **/data_analysis** directory to avoid path issues, or just modify the code to consider your full path. You possibly need to install additional Python packages for the notebook to run (e.g. you might need [`moviepy`](https://pypi.org/project/moviepy/))
+After having these files, you can run the Jupyter Notebook [data_analysis_musical_encounters.ipynb](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/python/sysmus25_workshop/data_analysis/data_analysis_musical_encounters.ipynb). Ensure that your Jupyter Notebook instance points to the **/data_analysis** directory to avoid path issues, or just modify the code to consider your full path. You possibly need to install additional Python packages for the notebook to run (e.g. you might need [`moviepy`](https://pypi.org/project/moviepy/))
 
 ## Going Further:
 
