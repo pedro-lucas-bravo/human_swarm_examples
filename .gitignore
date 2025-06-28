@@ -89,3 +89,5 @@ x86/
 bld/
 [Bb]in/
 [Oo]bj/
+
+.python-ims/
