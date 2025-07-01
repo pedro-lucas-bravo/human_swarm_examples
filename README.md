@@ -1,3 +1,130 @@
+# HS-ims: A Platform for Human-Swarm Interactive Music Systems
+
+## Quick Installation/Run Guide (For artifact assessment ):
+
+In this section, you can run **HS-ims** on Windows, Mac, or Linux, and execute one of the examples in Python by installing a Python Virtual Environment that already meets the requirements for running. For other programming languages, refer further sections, which might have repeated information found here.
+
+### FOR ALL OSs:
+
+1. If you still don't have it, install [Python (>3.12)](https://www.python.org/), 
+2. Download this repository locally.
+3. Download the **HS-ims** app compatible with your OS. Linux users should use the same .exe file as Windows because there are features not natively supported that didn’t allow us to create an executable for Linux; therefore, we will indicate how to run the .exe on Linux.
+* [**HS-ims** Windows](https://github.com/pedro-lucas-bravo/human_swarm_examples/releases/download/v1.0.0/win_ims.zip)(Unzip the file and open the *Human Swarm IMS.exe* file to check that the app is working)
+* [**HS-ims** Mac](https://github.com/pedro-lucas-bravo/human_swarm_examples/releases/download/v1.0.0/mac_ims.zip)(Unzip the file and open the .app file)
+    
+    > MacOS users may encounter issues when attempting to open this app. In this case, open a terminal and run the command `xattr -rc [PATH_TO_APP]` then try to open the app again. In case it still does not allow you to open the app, try the following:
+        
+    * Open a terminal and navigate to the following path:
+
+        `cd <DOWNLOAD_PATH>/mac_ims.app/Contents/MacOS`
+
+    * Once in this address, execute the following command:
+    
+        `chmod -R 777 "Human Swarm IMS"`
+
+    * Now you should be able to open the app.
+* [**HS-ims** Linux (It is the same windows exe)](https://github.com/pedro-lucas-bravo/human_swarm_examples/releases/download/v1.0.0/win_ims.zip) (IMPORTANT: It was tested in Ubuntu 24.04.2 LTS)
+	* Unzip the file in a location of your preference.
+  * Install [Wine](https://www.winehq.org/), which is a compatibility layer capable of running Windows applications. You can do this in a terminal by typing:
+
+    `sudo apt-get install wine`
+
+    The version we got when we installed was "wine-9.0 (Ubuntu 9.0-repack-4build)", you might have got a newer version or the same under the Ubuntu distribution we tested.
+
+  * In the terminal, navigate to the location of the .exe and execute the next command to open the program:
+
+    `wine 'Human Swarm IMS.exe'`
+
+    **KNOWN ISSUES:** Sometimes the wine solution does not execute the program perfectly. In this case, we found that when you remove focus from the application, you cannot interact with GUI-related controls (e.g., open the CONFIG, or use the mouse to navigate the environment); you can only use the mouse pointer to interact with the 3D elements (still with OSC, some UI controls can be executed, like for data recording). In the future, we will resolve the issues that prevent us from having a native version for Linux. Alternatively, you can run the External Controllers in Linux and communicate with the app running on a Windows or Mac machine through the network, thanks to the OSC messaging capabilities.
+
+
+4. Follow the instructions below according to your OS to create the environment that will run any of the examples implemented in Python, which are External Controllers for **HS-ims**.
+
+### WINDOWS:
+
+1. Create a folder called `.python-ims` in the root of the repository, so that you can have the path `<DOWNLOAD_PATH>/human_swarm_examples/.python-ims`
+
+2. Open a PowerShell console (don’t use the normal cmd), and navigate to the root of the repository:
+
+    `cd <DOWNLOAD_PATH>/human_swarm_examples`
+
+3. Install the Python Virtual Environment by using the next three commands (one per line). After this, you will be inside your local Python environment:
+
+    ```lang-sh
+    python -m venv .python-ims
+    Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted -Force
+    .\.python-ims\Scripts\Activate.ps1
+    ```
+4. Once inside the environment, execute the next command to install the requirements:
+
+    `pip install -r requirements.txt `
+
+5. Open **HS-ims** for this OS as explained above. Now you can run the example described in the next section **Running in the Python Environment**.
+
+### MAC or LINUX:
+
+1.  Create a folder called `.python-ims` in the root of the repository, so that you can have the path `<DOWNLOAD_PATH>/human_swarm_examples/.python-ims`
+
+2. Open a terminal, and navigate to the root of the repository:
+
+    `cd <DOWNLOAD_PATH>/human_swarm_examples`
+
+3. Install the Python Virtual Environment by using the next two commands (one per line). After this, you will be inside your local Python environment:
+
+    ```lang-sh
+    python -m venv .python-ims
+    source .python-ims/bin/activate
+    ```
+
+4. Once inside the environment, execute the next command to install the requirements:
+
+    `pip install -r requirements.txt `
+
+5. Open **HS-ims** for this OS as explained above. Now you can run the example described in the next section **Running in the Python Environment**.
+
+## Running in the Python Environment
+
+At this point, you were able to run the **HS-ims** app in your OS and had ready your Python environment for running the examples. In this case, we will indicate how to run one of the examples that was shown in a workshop related to the use of **HS-ims**. This example is in the folder `<DOWNLOAD_PATH>/human_swarm_examples/python/sysmus25_workshop/HS_systems/musical_encounters`
+
+1.  Ensure that you activate your Python environment. If not, you can activate it by going to the root folder of the repository and executing the next command:
+
+    **IN WINDOWS(Use PowerShell):**
+
+    `.\.python-ims\Scripts\Activate.ps1`
+
+    **IN MAC or LINUX**
+
+    `source .python-ims/bin/activate`
+
+    You can always exit the environment writing `deactivate` in the terminal on any OS.
+
+2. Navigate in the terminal to the folder mentioned above:
+
+    `cd <DOWNLOAD_PATH>/human_swarm_examples/python/sysmus25_workshop/HS_systems/musical_encounters`
+
+3. Execute the `main.py` script:
+
+    `python main.py`
+
+4. Then run the example by writing `run`. Your console should resemble this. Then press Enter:
+
+    ```lang-sh
+    Serving on ('127.0.0.1', 6010)
+    Enter a command: run
+    ```
+You must be able to see in the **HS-ims** app something similar to the image below, and hear constantly changing pitch sounds.
+
+![template](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/docs/imgs/template_img.png)
+
+**ARRIVING AT THIS POINT MEANS THAT YOU SUCCESSFULLY WERE ABLE TO RUN THE APP AND USED IT.**
+
+You can stop everything by writing `exit` in the console, which will terminate the Python script. 
+
+More details in this specific example can be found in the corresponding [README.md](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/python/sysmus25_workshop/README.md) file, were there is also indications for running the data collection example using a Jupiter Notebook, in this case, you can use the same Python environment since Jupiter Notebook is installed there.
+The following sections provide an expanded documentation of the app. But until now, you know that it works for you.
+
+(**Artifact assessment might stop here**)
+
 # Human-Swarm Systems' Examples
 
 These examples use a software for visualization and interaction of simple 3D elements that can communicate with external applications through OSC messages. We called the **Human-Swarm Interactive Music System App (HS-ims app)**. It is intended for multi-agent systems with a user interaction focus, especially for sound and music applications. It only supports Windows and Mac OS. You can download the executables for each OS from:
