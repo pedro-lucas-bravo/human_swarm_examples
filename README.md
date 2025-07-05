@@ -1,10 +1,20 @@
 # HS-ims: A Platform for Human-Swarm Interactive Music Systems
 
-## Quick Installation/Run Guide (For artifact assessment ):
+## Quick Installation/Run Guide (For artifact assessment):
 
 In this section, you can run **HS-ims** on Windows, Mac, or Linux, and execute one of the examples in Python by installing a Python Virtual Environment that already meets the requirements for running. For other programming languages, refer further sections, which might have repeated information found here.
 
+### Minimum System Requirements
+
+* **OS:** Windows 10+, MacOS 10.15+, Ubuntu 24+ (Win .exe through Wine)
+* **Processor:** 2GHz
+* **Memory:** 4 GB RAM
+* **Storage:** 150 MB available space 
+* **Graphics:** Integrated graphics are sufficient for basic functionality and lightweight visuals. However, a dedicated GPU is recommended for enhanced performance, especially in scenarios involving higher object counts.
+
 ### FOR ALL OSs:
+
+
 
 1. If you still don't have it, install [Python (>3.12)](https://www.python.org/), 
 2. Download this repository locally.
