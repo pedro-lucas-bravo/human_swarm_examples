@@ -91,3 +91,5 @@ bld/
 [Oo]bj/
 
 .python-ims/
+
+python/performance_testbed/data/*
