@@ -1,0 +1,5 @@
+# Attractors and Repellers
+
+In this example, agents are rotating over the surface of a sphere that surrounds an object (cyan cube) in a random direction and axis. If a user move this central object, agents will be still stick to it, so this object will be an attractor. Agents move to the closer attractor. Additionally, there is a type of objects (red cube) with a bigger radius that, when close to agents, it repels them from their current center, it is the repeller. Users can interact only moving attractors and repellers to change the emergent behaviour of the agents. As explained before, agents start around a center with a random axis and with zero speed, they use local communication to share their current angle regarding their center and local axis to other agents, then agents that receive this data modify their speed to move around, which can result in faster or slower movements depending on the configuration regarding attractors, repellers, and other agents. Audio mappings are added to sonify this swarm behaviour.
+
+![attractor_repellers](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/docs/imgs/attractors_repelers.jpeg)

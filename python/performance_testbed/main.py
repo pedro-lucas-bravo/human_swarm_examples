@@ -281,10 +281,16 @@ def run_experiment():
     global COLLECT_DATA_AND_SAVE
     global USE_AUDIO
 
-    MAX_ITERATIONS = 300
+    USE_AUDIO = True #Change here to decide if experiment will use audio or not
+
+    MAX_ITERATIONS = 500
     COLLECT_DATA_AND_SAVE = True  # Set to True to collect and save data
-    USE_AUDIO = True
-    number_of_autonomous_agents = [80, 249, 250]#[2 ** i for i in range(0, 12)]  # [2, 4, 8, ..., 2048]
+    if USE_AUDIO:
+        number_of_autonomous_agents = [1, 2, 4, 8, 16, 32, 64, 128, 249]  #[23, 24, 25, 26]
+    else:
+        number_of_autonomous_agents = [2 ** i for i in range(0, 12)]#[80, 249, 250]#  # [2, 4, 8, ..., 2048]
+        #number_of_autonomous_agents = []
+        number_of_autonomous_agents.append(2608)
     
     client.send_message("/connect", [local_ip, local_port])    
     time.sleep(1)  # Wait for the connection to be established
