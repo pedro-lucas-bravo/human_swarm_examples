@@ -4,6 +4,10 @@
 
 In this section, you can run **HS-ims** on Windows, Mac, or Linux, and execute one of the examples in Python by installing a Python Virtual Environment that already meets the requirements for running. For other programming languages, refer further sections, which might have repeated information found here.
 
+## Note on Linux
+
+As you will see later, **HS-ims** runs on Linux using the Windows executable via [Wine](https://www.winehq.org/). This is because the sound synthesis engine we use for the platform ([CsoundUnity](https://github.com/rorywalsh/CsoundUnity)) does not yet support Linux. In the future, we will incorporate a different sound synthesis engine exclusively for Linux executables, unless *CsoundUnity* gains native support for this OS beforehand.
+
 ### Minimum System Requirements
 
 * **OS:** Windows 10+, MacOS 10.15+, Ubuntu 24+ (Win .exe through Wine)
@@ -13,8 +17,6 @@ In this section, you can run **HS-ims** on Windows, Mac, or Linux, and execute o
 * **Graphics:** Integrated graphics are sufficient for basic functionality and lightweight visuals. However, a dedicated GPU is recommended for enhanced performance, especially in scenarios involving higher object counts.
 
 ### FOR ALL OSs:
-
-
 
 1. If you still don't have it, install [Python (>3.12)](https://www.python.org/), 
 2. Download this repository locally.
@@ -137,7 +139,7 @@ The following sections provide an expanded documentation of the app. But until n
 
 # Human-Swarm Systems' Examples
 
-These examples use a software for visualization and interaction of simple 3D elements that can communicate with external applications through OSC messages. We called the **Human-Swarm Interactive Music System App (HS-ims app)**. It is intended for multi-agent systems with a user interaction focus, especially for sound and music applications. It only supports Windows and Mac OS. You can download the executables for each OS from:
+These examples use a software for visualization and interaction of simple 3D elements that can communicate with external applications through OSC messages. We called the **Human-Swarm Interactive Music System App (HS-ims app)**. It is intended for multi-agent systems with a user interaction focus, especially for sound and music applications. It only supports natively Windows and MacOS (Linux through *Wine* as explained in the [starting guide](https://github.com/pedro-lucas-bravo/human_swarm_examples?tab=readme-ov-file#quick-installationrun-guide-for-artifact-assessment)). You can download the executables for each OS from:
 
 * [HS-ims Windows](https://github.com/pedro-lucas-bravo/human_swarm_examples/releases/download/v1.0.0/win_ims.zip)
 
@@ -145,7 +147,7 @@ These examples use a software for visualization and interaction of simple 3D ele
 
 There is not installation process, this application can be opened directly.
 
-This repository contains examples that use this **HS-ims app** considering three programming languages; [Python](https://www.python.org/), [C++](https://cplusplus.com/), and [Max 8](https://cycling74.com/products/max). However, as you can communicate with the **HS-ims app** through [OSC](https://ccrma.stanford.edu/groups/osc/index.html) messages, you can use any software that supports standard UDP communication and create you own interactive swarm system. With that in mind, we are going to describe first the **HS-ims app**, then *how to run the examples*, and the *OSC API* for the **HS-ims app** if you want to create your own applications.
+This repository contains examples that use this **HS-ims app** considering three programming languages; [Python](https://www.python.org/), [C++](https://cplusplus.com/), and [Max](https://cycling74.com/products/max). However, as you can communicate with the **HS-ims app** through [OSC](https://ccrma.stanford.edu/groups/osc/index.html) messages, you can use any software that supports standard UDP communication and create you own interactive swarm system. With that in mind, we are going to describe first the **HS-ims app**, then *how to run the examples*, and the *OSC API* for the **HS-ims app** if you want to create your own applications.
 
 
 
@@ -160,7 +162,7 @@ This app serves mainly for three purposes:
 
 ![hs-ims-main-iterface](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/docs/imgs/hs-ims-main-interface.png)
 
-The two cyan objects were created by another software (let's call it *X app*) that sent the corresponding OSC messages to instantiate and place them in an specific (x, y, z) point. Both objects can be clicked (left or right button in the mouse) and only the cube can be moved in the plane of its faces using the mouse, these interactions can be sent back to *X app* if needed, which allows a two-way communication. As OSC messages are based on UDP, the **HS-ims app** and *X app* can reside in different machines connected through the network. We are exemplifying in this repository this two-way communication with the three programming languages used in the examples ([Python](https://www.python.org/), [C++](https://cplusplus.com/), and [Max 8](https://cycling74.com/products/max). At the end, we are going to describe the OSC API that allows you to use the **HS-ims app** and understand the examples in this repository.
+The two cyan objects were created by another software (let's call it *X app*) that sent the corresponding OSC messages to instantiate and place them in an specific (x, y, z) point. Both objects can be clicked (left or right button in the mouse) and only the cube can be moved in the plane of its faces using the mouse, these interactions can be sent back to *X app* if needed, which allows a two-way communication. As OSC messages are based on UDP, the **HS-ims app** and *X app* can reside in different machines connected through the network. We are exemplifying in this repository this two-way communication with the three programming languages used in the examples ([Python](https://www.python.org/), [C++](https://cplusplus.com/), and [Max](https://cycling74.com/products/max). At the end, we are going to describe the OSC API that allows you to use the **HS-ims app** and understand the examples in this repository.
 
 The *audio listener* object can be moved as the cyan cube and is able to change the spatial audio reference when we are synthesizing sound through the app.
 
@@ -202,13 +204,13 @@ Some of the examples here are developed in more than one language and might have
 
 * **Swarmalators:** This example is based on a model that couples oscillators and spatial positions. They are "oscillators that sync and swarm" or in short "swarmalators", proposed and studied by O'keeffe at al ([paper here](https://www.nature.com/articles/s41467-017-01190-3)). There are several patterns achieved by these set of agents depending on certain parameters. We explore how a user can interact with a group of agents by changing those parameters and participating as one more "swarmalator" in the group. Some implementations in this repository map the swarmalators' dynamics to sound, demonstrating an emergent output from the multiple interactions of the agents.
 
-We assume that you have a basic knowledge of the programming languages listed below and a working environment in your machine for the ones that you are interested in. These examples has been tested on Windows, but they should work on Mac OS with particular considerations (specially for the C++ example).
+We assume that you have a basic knowledge of the programming languages listed below and a working environment in your machine for the ones that you are interested in. These examples has been tested on Windows, but they should work on MacOS and Linux with particular considerations (specially for the C++ example).
 
-Previous to run the examples, open the **HS-ims app** according to your OS (You can download it from the links above or [here](https://github.com/pedro-lucas-bravo/human_swarm_examples/releases/tag/v1.0.0))
+Before running the examples, open the **HS-ims app** according to your OS (You can download it from the links above or [here](https://github.com/pedro-lucas-bravo/human_swarm_examples/releases/tag/v1.0.0))
 
 <!--..... open the **HS-ims app** for all, these were implemented  and tested in windows, so find a way to work with max) -->
 
-### 2.1. MAX
+### 2.1. Cycling '74 MAX (Windows and MacOS)
 
 **Requirements:** 
 * *You need to add the [odot](https://cycling74.com/packages/odot) package to your Max installation. This package is used to manage OSC bundles.*
@@ -221,7 +223,7 @@ Open the  **HS-ims app** then, open [Max](https://cycling74.com/products/max). W
 
 * **[swarmalators](https://github.com/pedro-lucas-bravo/human_swarm_examples/tree/main/max/swarmalators/swarmalators)**: Activate the audio in Max (needed to use a sound oscillator to update the agents' color) and press the toggle pointed by the `2. START HERE ON - OFF` label to run or stop the system. This example does not produce any sound and is fixed to 30 agents in 'active phase wave' mode. It would require a fair knowledge of Max and the understanding of the example for trying different parameter values.
 
-### 2.2. Python
+### 2.2. Python (Windows, MacOS, and Linux)
 
 **Requirements:**
 
@@ -244,17 +246,26 @@ After running you will see a simple user interface to control the swarmalators p
 
 To stop and remove everything just close the simple user interface.
 
-### 2.3. C++
+### 2.3. C++ (Windows)
 
-This example was run in Windows, so it is up to you to figure out how to run in Mac OS.
-
-**Requirements:**
+**Requirements on Windows:**
 
 * *Visual studio 2022 (Install the module `Desktop development with C++`)*
 * *DirectX 12*
 * If you want to run in Mac, figure out and perform the necessary modifications to make these two integrated library works in the project:
   >* [oscpack](http://www.rossbencina.com/code/oscpack) (The most important modification is how to manage sockets)
   >* [imgui](https://github.com/ocornut/imgui/wiki/Getting-Started) (You might need to use a graphic engine different than DirectX 12)
+
+**Considerations for MacOS and Linux**
+
+There are no examples for these operating systems in this repository at the moment; however, if you want to run on MacOS or Linux, you can still use the code. You can consider the following initial points:
+
+* Compiler and build system: *Xcode* in MacOS (include *clang* and *make*), *GCC* or *Clang* for Linux.
+* Graphics library: Instead of *DirectX 12* you can use [Vulkan](https://www.vulkan.org/) or [OpenGL](https://www.opengl.org/).
+* Modify the socket code of [oscpack](http://www.rossbencina.com/code/oscpack) for Unix-based systems.
+* Select and configure the right graphics backend (*Vulkan* or *OpenGL*) for [imgui](https://github.com/ocornut/imgui/wiki/Getting-Started).
+
+Then the instructions to run are similar to those below, depending on your development environment.
 
 **How to run:**
 
