@@ -94,7 +94,7 @@ As the emphasis shifts more towards the concepts and abstractions behind this to
 
     You can do the same for **musical_encounters** by navigating in the corresponding folder and executing the `main.py` script. In that case, you must observe in the app something like the next image, together with reverberated punctual musical sounds.
 
-    ![musical_encounters](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/docs/imgs/musical_encounters_img.png)
+    ![musical_encounters](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/docs/imgs/musical_encounters.jpeg)
 
     Again, you can stop by writing `exit` in the console. You can alternatively kill the terminal and close the **HS-ims** app.
 
