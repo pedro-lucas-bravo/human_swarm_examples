@@ -1,6 +1,10 @@
 # HS-ims: A Platform for Human-Swarm Interactive Music Systems
 
-## Quick Installation/Run Guide (For artifact assessment):
+## Paper related to the ACSOS 2025 conference (Currently available only to conference participants in the following link):
+
+https://conferences.computer.org/acsospub25/pdfs/ACSOS-C2025-ywiRR4PT8QMOYKgQ1Fhwy/021500a233/021500a233.pdf
+
+## Quick Installation/Run Guide:
 
 In this section, you can run **HS-ims** on Windows, Mac, or Linux, and execute one of the examples in Python by installing a Python Virtual Environment that already meets the requirements for running. For other programming languages, refer further sections, which might have repeated information found here.
 
@@ -134,8 +138,6 @@ You can stop everything by writing `exit` in the console, which will terminate t
 
 More details in this specific example can be found in the corresponding [README.md](https://github.com/pedro-lucas-bravo/human_swarm_examples/blob/main/python/sysmus25_workshop/README.md) file, were there is also indications for running the data collection example using a Jupiter Notebook, in this case, you can use the same Python environment since Jupiter Notebook is installed there.
 The following sections provide an expanded documentation of the app. But until now, you know that it works for you.
-
-(**Artifact assessment might stop here**)
 
 # Human-Swarm Systems' Examples
 
