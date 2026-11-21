@@ -1,8 +1,8 @@
 # HS-ims: A Platform for Human-Swarm Interactive Music Systems
 
-## Paper related to the ACSOS 2025 conference (Currently available only to conference participants in the following link):
+## Paper related to the ACSOS 2025 conference:
 
-https://conferences.computer.org/acsospub25/pdfs/ACSOS-C2025-ywiRR4PT8QMOYKgQ1Fhwy/021500a233/021500a233.pdf
+https://ieeexplore.ieee.org/document/11217505
 
 ## Quick Installation/Run Guide:
 
